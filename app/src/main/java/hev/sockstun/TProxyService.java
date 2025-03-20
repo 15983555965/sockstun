@@ -238,16 +238,8 @@ public class TProxyService extends VpnService {
 			tunFd = builder.establish();
 			if (tunFd == null) {
 				Log.e(TAG, "VPN establishment failed");
-				if (isHarmonyOS()) {
-					// 鸿蒙系统特定重试逻辑
-					Log.d(TAG, "Retrying VPN connection on HarmonyOS");
-					Thread.sleep(1000);
-					tunFd = builder.establish();
-				}
-				if (tunFd == null) {
-					stopSelf();
-					return;
-				}
+				stopSelf();
+				return;
 			}
 		} catch (Exception e) {
 			Log.e(TAG, "VPN error: " + e.getMessage());
