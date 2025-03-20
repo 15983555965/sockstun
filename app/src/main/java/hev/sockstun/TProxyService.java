@@ -12,6 +12,7 @@ package hev.sockstun;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -209,14 +210,19 @@ public class TProxyService extends VpnService {
 		// 应用过滤配置
 		boolean disallowSelf = true;
 		if (prefs.getGlobal()) {
+			Log.d(TAG, "使用全局模式 - 所有应用允许");
 			session += "/Global";
 		} else {
+			Log.d(TAG, "使用应用过滤模式");
+			Log.d(TAG, "选中的应用列表: " + prefs.getApps());
+			
 			for (String appName : prefs.getApps()) {
 				try {
 					builder.addAllowedApplication(appName);
 					disallowSelf = false;
+					Log.d(TAG, "添加应用到允许列表: " + appName);
 				} catch (NameNotFoundException e) {
-					Log.e(TAG, "App not found: " + appName);
+					Log.e(TAG, "应用未找到: " + appName);
 				}
 			}
 			session += "/per-App";
@@ -225,24 +231,34 @@ public class TProxyService extends VpnService {
 		if (disallowSelf) {
 			String selfName = getApplicationContext().getPackageName();
 			try {
+				Log.d(TAG, "没有选择任何应用，将VPN服务添加到禁止列表: " + selfName);
 				builder.addDisallowedApplication(selfName);
 			} catch (NameNotFoundException e) {
-				Log.e(TAG, "Self app not found");
+				Log.e(TAG, "VPN服务未找到: " + selfName);
 			}
 		}
 
 		builder.setSession(session);
+		Log.d(TAG, "VPN会话名称: " + session);
 
 		// 尝试建立VPN连接
 		try {
+			Log.d(TAG, "开始建立VPN连接...");
+			Log.d(TAG, "VPN配置信息:");
+			Log.d(TAG, "Session: " + session);
+			Log.d(TAG, "MTU: " + (isHarmonyOS() ? 1500 : prefs.getTunnelMtu()));
+			Log.d(TAG, "Blocking: " + isHarmonyOS());
+			
 			tunFd = builder.establish();
 			if (tunFd == null) {
-				Log.e(TAG, "VPN establishment failed");
+				Log.e(TAG, "VPN连接建立失败");
 				stopSelf();
 				return;
 			}
+			Log.d(TAG, "VPN连接建立成功");
 		} catch (Exception e) {
-			Log.e(TAG, "VPN error: " + e.getMessage());
+			Log.e(TAG, "VPN错误: " + e.getMessage());
+			Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
 			stopSelf();
 			return;
 		}
@@ -250,6 +266,7 @@ public class TProxyService extends VpnService {
 		/* TProxy */
 		File tproxy_file = new File(getCacheDir(), "tproxy.conf");
 		try {
+			Log.d(TAG, "创建TProxy配置文件...");
 			tproxy_file.createNewFile();
 			FileOutputStream fos = new FileOutputStream(tproxy_file, false);
 
@@ -269,15 +286,30 @@ public class TProxyService extends VpnService {
 				tproxy_conf += "  password: '" + prefs.getSocksPassword() + "'\n";
 			}
 
+			Log.d(TAG, "TProxy配置文件路径: " + tproxy_file.getAbsolutePath());
+			Log.d(TAG, "TProxy配置内容:\n" + tproxy_conf);
+			
 			fos.write(tproxy_conf.getBytes());
 			fos.close();
+			Log.d(TAG, "TProxy配置文件写入成功");
 		} catch (IOException e) {
-			Log.e(TAG, "Failed to create tproxy config: " + e.getMessage());
+			Log.e(TAG, "创建TProxy配置文件失败: " + e.getMessage());
+			Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
 			return;
 		}
 
-		TProxyStartService(tproxy_file.getAbsolutePath(), tunFd.getFd());
-		prefs.setEnable(true);
+		Log.d(TAG, "启动TProxy服务...");
+		try {
+			Log.d(TAG, "启动TProxy服务");
+			TProxyStartService(tproxy_file.getAbsolutePath(), tunFd.getFd());
+			Log.d(TAG, "TProxy服务启动成功");
+			prefs.setEnable(true);
+		} catch (Exception e) {
+			Log.e(TAG, "TProxy服务启动失败: " + e.getMessage());
+			Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
+			stopSelf();
+			return;
+		}
 
 		String channelName = "socks5";
 		initNotificationChannel(channelName);
