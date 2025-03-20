@@ -1,0 +1,66 @@
+[
+    {
+        "merged": "hev.sockstun.app-debug-16:/mipmap-hdpi_sockstun.png.flat",
+        "source": "hev.sockstun.app-main-18:/mipmap-hdpi/sockstun.png"
+    },
+    {
+        "merged": "hev.sockstun.app-debug-16:/drawable_dialog_button_bg.xml.flat",
+        "source": "hev.sockstun.app-main-18:/drawable/dialog_button_bg.xml"
+    },
+    {
+        "merged": "hev.sockstun.app-debug-16:/mipmap-xxhdpi_sockstun.png.flat",
+        "source": "hev.sockstun.app-main-18:/mipmap-xxhdpi/sockstun.png"
+    },
+    {
+        "merged": "hev.sockstun.app-debug-16:/anim_dialog_enter.xml.flat",
+        "source": "hev.sockstun.app-main-18:/anim/dialog_enter.xml"
+    },
+    {
+        "merged": "hev.sockstun.app-debug-16:/drawable_dialog_background.xml.flat",
+        "source": "hev.sockstun.app-main-18:/drawable/dialog_background.xml"
+    },
+    {
+        "merged": "hev.sockstun.app-debug-16:/mipmap-xxhdpi_icon.jpeg.flat",
+        "source": "hev.sockstun.app-main-18:/mipmap-xxhdpi/icon.jpeg"
+    },
+    {
+        "merged": "hev.sockstun.app-debug-16:/layout_main.xml.flat",
+        "source": "hev.sockstun.app-main-18:/layout/main.xml"
+    },
+    {
+        "merged": "hev.sockstun.app-debug-16:/drawable_edittext_background.xml.flat",
+        "source": "hev.sockstun.app-main-18:/drawable/edittext_background.xml"
+    },
+    {
+        "merged": "hev.sockstun.app-debug-16:/mipmap-xhdpi_sockstun.png.flat",
+        "source": "hev.sockstun.app-main-18:/mipmap-xhdpi/sockstun.png"
+    },
+    {
+        "merged": "hev.sockstun.app-debug-16:/drawable_button_blue_background.xml.flat",
+        "source": "hev.sockstun.app-main-18:/drawable/button_blue_background.xml"
+    },
+    {
+        "merged": "hev.sockstun.app-debug-16:/mipmap-mdpi_sockstun.png.flat",
+        "source": "hev.sockstun.app-main-18:/mipmap-mdpi/sockstun.png"
+    },
+    {
+        "merged": "hev.sockstun.app-debug-16:/drawable_dialog_auth.xml.flat",
+        "source": "hev.sockstun.app-main-18:/drawable/dialog_auth.xml"
+    },
+    {
+        "merged": "hev.sockstun.app-debug-16:/drawable_button_select_background.xml.flat",
+        "source": "hev.sockstun.app-main-18:/drawable/button_select_background.xml"
+    },
+    {
+        "merged": "hev.sockstun.app-debug-16:/layout_appitem.xml.flat",
+        "source": "hev.sockstun.app-main-18:/layout/appitem.xml"
+    },
+    {
+        "merged": "hev.sockstun.app-debug-16:/layout_dialog_auth.xml.flat",
+        "source": "hev.sockstun.app-main-18:/layout/dialog_auth.xml"
+    },
+    {
+        "merged": "hev.sockstun.app-debug-16:/mipmap-xxxhdpi_sockstun.png.flat",
+        "source": "hev.sockstun.app-main-18:/mipmap-xxxhdpi/sockstun.png"
+    }
+]

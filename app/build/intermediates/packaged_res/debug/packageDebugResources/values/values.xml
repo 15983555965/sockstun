@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="colorPrimary">#2196F3</color>
+    <color name="gray">#808080</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="white">#FFFFFFFF</color>
+    <drawable name="dialog_round_bg">#FFFFFF</drawable>
+    <string name="app_name">鸡毛信</string>
+    <string name="apps">选择应用</string>
+    <string name="control_disable">断开连接</string>
+    <string name="control_enable">开始连接</string>
+    <string name="dns_ipv4">DNS IPv4:</string>
+    <string name="dns_ipv6">DNS IPv6:</string>
+    <string name="global">Global</string>
+    <string name="ipv4">IPv4</string>
+    <string name="ipv6">IPv6</string>
+    <string name="save">Save</string>
+    <string name="socks_addr">Socks Address:</string>
+    <string name="socks_pass">Socks Password:</string>
+    <string name="socks_port">Socks Port:</string>
+    <string name="socks_user">Socks Username:</string>
+    <string name="udp_in_tcp">UDP relay over TCP</string>
+    <style name="AuthDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorPrimary">#2196F3</item>
+        <item name="android:textColorPrimary">#333333</item>
+        <item name="android:windowBackground">@drawable/dialog_background</item>
+    </style>
+    <style name="CenterDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/dialog_round_bg</item>
+        <item name="android:windowMinWidthMajor">85%</item>
+        <item name="android:windowMinWidthMinor">85%</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/dialog_enter</item>
+
+    </style>
+    <style name="TimerTextStyle">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">#4CAF50</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:letterSpacing">0.1</item>
+        <item name="android:shadowColor">#88000000</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">2</item>
+    </style>
+</resources>

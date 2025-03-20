@@ -1,0 +1,254 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:2:1-42:12
+INJECTED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:2:1-42:12
+INJECTED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:2:1-42:12
+INJECTED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:2:1-42:12
+MERGED from [jmx.aar] /Users/jenny/.gradle/caches/8.8/transforms/f9eb7d834bbc6976ba49baa88b14b6ee/transformed/jetified-jmx/AndroidManifest.xml:1:1-2:50
+MERGED from [androidx.appcompat:appcompat:1.4.1] /Users/jenny/.gradle/caches/8.8/transforms/3137ab1faf04ae02f9c5fbec7a6f61e9/transformed/appcompat-1.4.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.fragment:fragment:1.3.6] /Users/jenny/.gradle/caches/8.8/transforms/3111173f2986c2e56822b50dcfedb76b/transformed/fragment-1.3.6/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.activity:activity:1.2.4] /Users/jenny/.gradle/caches/8.8/transforms/a29432d9731a50719e56824551635a0a/transformed/jetified-activity-1.2.4/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.appcompat:appcompat-resources:1.4.1] /Users/jenny/.gradle/caches/8.8/transforms/59f6a5cadfbc65570d34f1cea6655c1d/transformed/jetified-appcompat-resources-1.4.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/b4e9cc84489e2704ff12ebbe60d84cc7/transformed/drawerlayout-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.emoji2:emoji2-views-helper:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/d7a021178eb44559c832793e27965da2/transformed/jetified-emoji2-views-helper-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:17:1-37:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/804dc07fa4a5ad9a7fc4a6b72ab45ac7/transformed/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.loader:loader:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/44dcb2e4f77dd075c59033ef582ba61c/transformed/loader-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /Users/jenny/.gradle/caches/8.8/transforms/6a59374d20f3f570d4b071696fc4c49e/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /Users/jenny/.gradle/caches/8.8/transforms/0549ee19c37a1fdfe015082f1a3beea0/transformed/vectordrawable-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.customview:customview:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/df470d9a6bccf35f5ed295c36e169c55/transformed/customview-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core:1.7.0] /Users/jenny/.gradle/caches/8.8/transforms/213496aa3ce2af59f8fada85ca191fc9/transformed/core-1.7.0/AndroidManifest.xml:17:1-26:12
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/564ed640cf45e72900834f72e0f7663b/transformed/cursoradapter-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.3.1] /Users/jenny/.gradle/caches/8.8/transforms/8f149b26d734df4dc5aff1b621d78a4b/transformed/jetified-lifecycle-viewmodel-savedstate-2.3.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.savedstate:savedstate:1.1.0] /Users/jenny/.gradle/caches/8.8/transforms/d006b1f7a1e15d5dfddc52f06f3fd110/transformed/jetified-savedstate-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.3.1] /Users/jenny/.gradle/caches/8.8/transforms/19bd1a3230b95a23b93f4f7ee079adf3/transformed/lifecycle-viewmodel-2.3.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/jenny/.gradle/caches/8.8/transforms/47b87ad48ac4755b17186cfe0bbb7419/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.lifecycle:lifecycle-process:2.4.0] /Users/jenny/.gradle/caches/8.8/transforms/17ed51b0bf999c1ae5095aaf37139e07/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:17:1-37:12
+MERGED from [androidx.startup:startup-runtime:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/7b38b9ef4d656375de4d2a6737a7ef2b/transformed/jetified-startup-runtime-1.0.0/AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.tracing:tracing:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/ba24a966720ef58f05f6d6c6270bb6d5/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /Users/jenny/.gradle/caches/8.8/transforms/e6cc4402ce28254f4dbe46bfc9d4c4c3/transformed/lifecycle-livedata-2.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.3.1] /Users/jenny/.gradle/caches/8.8/transforms/0693286d5d301dc2628ad3cf2e8ac88a/transformed/lifecycle-livedata-core-2.3.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.4.0] /Users/jenny/.gradle/caches/8.8/transforms/b555509444de85b5261c4539ab9b6dd5/transformed/lifecycle-runtime-2.4.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.arch.core:core-runtime:2.1.0] /Users/jenny/.gradle/caches/8.8/transforms/85aad75a1c9e76dace8b660df6b9689b/transformed/core-runtime-2.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/8dd97c2b6dd9d6aea0b0a5ba03602f8c/transformed/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.annotation:annotation-experimental:1.1.0] /Users/jenny/.gradle/caches/8.8/transforms/66977a56a4a530ac4cd99fb34a3d695b/transformed/jetified-annotation-experimental-1.1.0/AndroidManifest.xml:17:1-24:12
+	package
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:3:3-25
+		INJECTED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml
+	xmlns:tools
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:4:3-49
+	android:versionCode
+		INJECTED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:2:11-69
+application
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:5:2-33:16
+INJECTED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:5:2-33:16
+MERGED from [androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:25:5-35:19
+MERGED from [androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:25:5-35:19
+MERGED from [androidx.core:core:1.7.0] /Users/jenny/.gradle/caches/8.8/transforms/213496aa3ce2af59f8fada85ca191fc9/transformed/core-1.7.0/AndroidManifest.xml:24:5-89
+MERGED from [androidx.core:core:1.7.0] /Users/jenny/.gradle/caches/8.8/transforms/213496aa3ce2af59f8fada85ca191fc9/transformed/core-1.7.0/AndroidManifest.xml:24:5-89
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/jenny/.gradle/caches/8.8/transforms/47b87ad48ac4755b17186cfe0bbb7419/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/jenny/.gradle/caches/8.8/transforms/47b87ad48ac4755b17186cfe0bbb7419/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.4.0] /Users/jenny/.gradle/caches/8.8/transforms/17ed51b0bf999c1ae5095aaf37139e07/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:25:5-35:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.4.0] /Users/jenny/.gradle/caches/8.8/transforms/17ed51b0bf999c1ae5095aaf37139e07/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:25:5-35:19
+MERGED from [androidx.startup:startup-runtime:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/7b38b9ef4d656375de4d2a6737a7ef2b/transformed/jetified-startup-runtime-1.0.0/AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.startup:startup-runtime:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/7b38b9ef4d656375de4d2a6737a7ef2b/transformed/jetified-startup-runtime-1.0.0/AndroidManifest.xml:25:5-31:19
+	android:extractNativeLibs
+		INJECTED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.7.0] /Users/jenny/.gradle/caches/8.8/transforms/213496aa3ce2af59f8fada85ca191fc9/transformed/core-1.7.0/AndroidManifest.xml:24:18-86
+	android:label
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:5:15-47
+	android:icon
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:5:48-75
+	android:theme
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:6:3-44
+service#hev.sockstun.TProxyService
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:7:3-16:13
+	android:process
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:7:42-67
+	android:exported
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:9:5-28
+	android:permission
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:8:5-61
+	android:foregroundServiceType
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:10:5-47
+	android:name
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:7:12-41
+intent-filter#action:name:android.net.VpnService
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:11:4-13:20
+action#android.net.VpnService
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:12:5-52
+	android:name
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:12:13-50
+property#android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:14:4-15:34
+	android:value
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:15:5-32
+	android:name
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:14:14-73
+receiver#hev.sockstun.ServiceReceiver
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:17:3-22:14
+	android:enabled
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:17:13-35
+	android:exported
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:18:4-27
+	android:name
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:17:36-67
+intent-filter#action:name:android.intent.action.BOOT_COMPLETED
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:19:4-21:20
+action#android.intent.action.BOOT_COMPLETED
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:20:5-66
+	android:name
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:20:13-64
+activity#hev.sockstun.MainActivity
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:23:3-31:14
+	android:label
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:23:42-74
+	android:excludeFromRecents
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:24:5-38
+	android:exported
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:25:4-27
+	android:name
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:23:13-41
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER+category:name:android.intent.category.LEANBACK_LAUNCHER
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:26:4-30:20
+action#android.intent.action.MAIN
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:27:5-56
+	android:name
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:27:13-54
+category#android.intent.category.LAUNCHER
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:28:5-64
+	android:name
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:28:15-62
+category#android.intent.category.LEANBACK_LAUNCHER
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:29:5-74
+	android:name
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:29:15-71
+activity#hev.sockstun.AppListActivity
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:32:3-79
+	android:label
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:32:45-77
+	android:name
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:32:13-44
+uses-permission#android.permission.INTERNET
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:34:2-63
+	android:name
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:34:19-61
+uses-permission#android.permission.FOREGROUND_SERVICE
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:35:2-73
+	android:name
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:35:19-71
+uses-permission#android.permission.POST_NOTIFICATIONS
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:36:2-73
+	android:name
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:36:19-71
+uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:37:2-77
+	android:name
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:37:19-75
+uses-permission#android.permission.QUERY_ALL_PACKAGES
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:38:2-39:47
+	tools:ignore
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:39:3-44
+	android:name
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:38:19-71
+uses-permission#android.permission.FOREGROUND_SERVICE_SPECIAL_USE
+ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:40:2-41:32
+	android:minSdkVersion
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:41:3-29
+	android:name
+		ADDED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:40:19-83
+uses-sdk
+INJECTED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml
+INJECTED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml
+MERGED from [jmx.aar] /Users/jenny/.gradle/caches/8.8/transforms/f9eb7d834bbc6976ba49baa88b14b6ee/transformed/jetified-jmx/AndroidManifest.xml:2:1-39
+MERGED from [jmx.aar] /Users/jenny/.gradle/caches/8.8/transforms/f9eb7d834bbc6976ba49baa88b14b6ee/transformed/jetified-jmx/AndroidManifest.xml:2:1-39
+MERGED from [androidx.appcompat:appcompat:1.4.1] /Users/jenny/.gradle/caches/8.8/transforms/3137ab1faf04ae02f9c5fbec7a6f61e9/transformed/appcompat-1.4.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.appcompat:appcompat:1.4.1] /Users/jenny/.gradle/caches/8.8/transforms/3137ab1faf04ae02f9c5fbec7a6f61e9/transformed/appcompat-1.4.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.3.6] /Users/jenny/.gradle/caches/8.8/transforms/3111173f2986c2e56822b50dcfedb76b/transformed/fragment-1.3.6/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.3.6] /Users/jenny/.gradle/caches/8.8/transforms/3111173f2986c2e56822b50dcfedb76b/transformed/fragment-1.3.6/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.activity:activity:1.2.4] /Users/jenny/.gradle/caches/8.8/transforms/a29432d9731a50719e56824551635a0a/transformed/jetified-activity-1.2.4/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.activity:activity:1.2.4] /Users/jenny/.gradle/caches/8.8/transforms/a29432d9731a50719e56824551635a0a/transformed/jetified-activity-1.2.4/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.appcompat:appcompat-resources:1.4.1] /Users/jenny/.gradle/caches/8.8/transforms/59f6a5cadfbc65570d34f1cea6655c1d/transformed/jetified-appcompat-resources-1.4.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.appcompat:appcompat-resources:1.4.1] /Users/jenny/.gradle/caches/8.8/transforms/59f6a5cadfbc65570d34f1cea6655c1d/transformed/jetified-appcompat-resources-1.4.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/b4e9cc84489e2704ff12ebbe60d84cc7/transformed/drawerlayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/b4e9cc84489e2704ff12ebbe60d84cc7/transformed/drawerlayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.emoji2:emoji2-views-helper:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/d7a021178eb44559c832793e27965da2/transformed/jetified-emoji2-views-helper-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.emoji2:emoji2-views-helper:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/d7a021178eb44559c832793e27965da2/transformed/jetified-emoji2-views-helper-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.viewpager:viewpager:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/804dc07fa4a5ad9a7fc4a6b72ab45ac7/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/804dc07fa4a5ad9a7fc4a6b72ab45ac7/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/44dcb2e4f77dd075c59033ef582ba61c/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/44dcb2e4f77dd075c59033ef582ba61c/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /Users/jenny/.gradle/caches/8.8/transforms/6a59374d20f3f570d4b071696fc4c49e/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /Users/jenny/.gradle/caches/8.8/transforms/6a59374d20f3f570d4b071696fc4c49e/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /Users/jenny/.gradle/caches/8.8/transforms/0549ee19c37a1fdfe015082f1a3beea0/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /Users/jenny/.gradle/caches/8.8/transforms/0549ee19c37a1fdfe015082f1a3beea0/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.customview:customview:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/df470d9a6bccf35f5ed295c36e169c55/transformed/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/df470d9a6bccf35f5ed295c36e169c55/transformed/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.7.0] /Users/jenny/.gradle/caches/8.8/transforms/213496aa3ce2af59f8fada85ca191fc9/transformed/core-1.7.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core:1.7.0] /Users/jenny/.gradle/caches/8.8/transforms/213496aa3ce2af59f8fada85ca191fc9/transformed/core-1.7.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/564ed640cf45e72900834f72e0f7663b/transformed/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/564ed640cf45e72900834f72e0f7663b/transformed/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.3.1] /Users/jenny/.gradle/caches/8.8/transforms/8f149b26d734df4dc5aff1b621d78a4b/transformed/jetified-lifecycle-viewmodel-savedstate-2.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.3.1] /Users/jenny/.gradle/caches/8.8/transforms/8f149b26d734df4dc5aff1b621d78a4b/transformed/jetified-lifecycle-viewmodel-savedstate-2.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.savedstate:savedstate:1.1.0] /Users/jenny/.gradle/caches/8.8/transforms/d006b1f7a1e15d5dfddc52f06f3fd110/transformed/jetified-savedstate-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.savedstate:savedstate:1.1.0] /Users/jenny/.gradle/caches/8.8/transforms/d006b1f7a1e15d5dfddc52f06f3fd110/transformed/jetified-savedstate-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.3.1] /Users/jenny/.gradle/caches/8.8/transforms/19bd1a3230b95a23b93f4f7ee079adf3/transformed/lifecycle-viewmodel-2.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.3.1] /Users/jenny/.gradle/caches/8.8/transforms/19bd1a3230b95a23b93f4f7ee079adf3/transformed/lifecycle-viewmodel-2.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/jenny/.gradle/caches/8.8/transforms/47b87ad48ac4755b17186cfe0bbb7419/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/jenny/.gradle/caches/8.8/transforms/47b87ad48ac4755b17186cfe0bbb7419/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-process:2.4.0] /Users/jenny/.gradle/caches/8.8/transforms/17ed51b0bf999c1ae5095aaf37139e07/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.lifecycle:lifecycle-process:2.4.0] /Users/jenny/.gradle/caches/8.8/transforms/17ed51b0bf999c1ae5095aaf37139e07/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/7b38b9ef4d656375de4d2a6737a7ef2b/transformed/jetified-startup-runtime-1.0.0/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/7b38b9ef4d656375de4d2a6737a7ef2b/transformed/jetified-startup-runtime-1.0.0/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.tracing:tracing:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/ba24a966720ef58f05f6d6c6270bb6d5/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.tracing:tracing:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/ba24a966720ef58f05f6d6c6270bb6d5/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /Users/jenny/.gradle/caches/8.8/transforms/e6cc4402ce28254f4dbe46bfc9d4c4c3/transformed/lifecycle-livedata-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /Users/jenny/.gradle/caches/8.8/transforms/e6cc4402ce28254f4dbe46bfc9d4c4c3/transformed/lifecycle-livedata-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.3.1] /Users/jenny/.gradle/caches/8.8/transforms/0693286d5d301dc2628ad3cf2e8ac88a/transformed/lifecycle-livedata-core-2.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.3.1] /Users/jenny/.gradle/caches/8.8/transforms/0693286d5d301dc2628ad3cf2e8ac88a/transformed/lifecycle-livedata-core-2.3.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.4.0] /Users/jenny/.gradle/caches/8.8/transforms/b555509444de85b5261c4539ab9b6dd5/transformed/lifecycle-runtime-2.4.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.4.0] /Users/jenny/.gradle/caches/8.8/transforms/b555509444de85b5261c4539ab9b6dd5/transformed/lifecycle-runtime-2.4.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.1.0] /Users/jenny/.gradle/caches/8.8/transforms/85aad75a1c9e76dace8b660df6b9689b/transformed/core-runtime-2.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.1.0] /Users/jenny/.gradle/caches/8.8/transforms/85aad75a1c9e76dace8b660df6b9689b/transformed/core-runtime-2.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.interpolator:interpolator:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/8dd97c2b6dd9d6aea0b0a5ba03602f8c/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/8dd97c2b6dd9d6aea0b0a5ba03602f8c/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.1.0] /Users/jenny/.gradle/caches/8.8/transforms/66977a56a4a530ac4cd99fb34a3d695b/transformed/jetified-annotation-experimental-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.annotation:annotation-experimental:1.1.0] /Users/jenny/.gradle/caches/8.8/transforms/66977a56a4a530ac4cd99fb34a3d695b/transformed/jetified-annotation-experimental-1.1.0/AndroidManifest.xml:20:5-22:41
+	android:targetSdkVersion
+		INJECTED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml
+provider#androidx.startup.InitializationProvider
+ADDED from [androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:26:9-34:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.4.0] /Users/jenny/.gradle/caches/8.8/transforms/17ed51b0bf999c1ae5095aaf37139e07/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:26:9-34:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.4.0] /Users/jenny/.gradle/caches/8.8/transforms/17ed51b0bf999c1ae5095aaf37139e07/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:26:9-34:20
+MERGED from [androidx.startup:startup-runtime:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/7b38b9ef4d656375de4d2a6737a7ef2b/transformed/jetified-startup-runtime-1.0.0/AndroidManifest.xml:26:9-30:34
+MERGED from [androidx.startup:startup-runtime:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/7b38b9ef4d656375de4d2a6737a7ef2b/transformed/jetified-startup-runtime-1.0.0/AndroidManifest.xml:26:9-30:34
+	tools:node
+		ADDED from [androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:30:13-31
+	android:authorities
+		ADDED from [androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:28:13-68
+	android:exported
+		ADDED from [androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:29:13-37
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:27:13-67
+meta-data#androidx.emoji2.text.EmojiCompatInitializer
+ADDED from [androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:31:13-33:52
+	android:value
+		ADDED from [androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:33:17-49
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:32:17-75
+meta-data#androidx.lifecycle.ProcessLifecycleInitializer
+ADDED from [androidx.lifecycle:lifecycle-process:2.4.0] /Users/jenny/.gradle/caches/8.8/transforms/17ed51b0bf999c1ae5095aaf37139e07/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:31:13-33:52
+	android:value
+		ADDED from [androidx.lifecycle:lifecycle-process:2.4.0] /Users/jenny/.gradle/caches/8.8/transforms/17ed51b0bf999c1ae5095aaf37139e07/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:33:17-49
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.4.0] /Users/jenny/.gradle/caches/8.8/transforms/17ed51b0bf999c1ae5095aaf37139e07/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:32:17-78

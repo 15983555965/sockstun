@@ -1,0 +1,143 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="hev.sockstun"
+4    android:versionCode="7"
+5    android:versionName="3.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="34" />
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:34:2-63
+11-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:34:19-61
+12    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+12-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:35:2-73
+12-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:35:19-71
+13    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+13-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:36:2-73
+13-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:36:19-71
+14    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+14-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:37:2-77
+14-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:37:19-75
+15    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+15-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:38:2-39:47
+15-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:38:19-71
+16    <uses-permission
+16-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:40:2-41:32
+17        android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"
+17-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:40:19-83
+18        android:minSdkVersion="34" />
+18-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:41:3-29
+19
+20    <application
+20-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:5:2-33:16
+21        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+21-->[androidx.core:core:1.7.0] /Users/jenny/.gradle/caches/8.8/transforms/213496aa3ce2af59f8fada85ca191fc9/transformed/core-1.7.0/AndroidManifest.xml:24:18-86
+22        android:debuggable="true"
+23        android:extractNativeLibs="false"
+24        android:icon="@mipmap/icon"
+24-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:5:48-75
+25        android:label="@string/app_name"
+25-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:5:15-47
+26        android:testOnly="true"
+27        android:theme="@android:style/Theme.Holo" >
+27-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:6:3-44
+28        <service
+28-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:7:3-16:13
+29            android:name="hev.sockstun.TProxyService"
+29-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:7:12-41
+30            android:exported="true"
+30-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:9:5-28
+31            android:foregroundServiceType="specialUse"
+31-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:10:5-47
+32            android:permission="android.permission.BIND_VPN_SERVICE"
+32-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:8:5-61
+33            android:process=":native" >
+33-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:7:42-67
+34            <intent-filter>
+34-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:11:4-13:20
+35                <action android:name="android.net.VpnService" />
+35-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:12:5-52
+35-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:12:13-50
+36            </intent-filter>
+37
+38            <property
+38-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:14:4-15:34
+39                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+39-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:14:14-73
+40                android:value="VPN service" />
+40-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:15:5-32
+41        </service>
+42
+43        <receiver
+43-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:17:3-22:14
+44            android:name="hev.sockstun.ServiceReceiver"
+44-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:17:36-67
+45            android:enabled="true"
+45-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:17:13-35
+46            android:exported="true" >
+46-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:18:4-27
+47            <intent-filter>
+47-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:19:4-21:20
+48                <action android:name="android.intent.action.BOOT_COMPLETED" />
+48-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:20:5-66
+48-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:20:13-64
+49            </intent-filter>
+50        </receiver>
+51
+52        <activity
+52-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:23:3-31:14
+53            android:name="hev.sockstun.MainActivity"
+53-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:23:13-41
+54            android:excludeFromRecents="true"
+54-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:24:5-38
+55            android:exported="true"
+55-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:25:4-27
+56            android:label="@string/app_name" >
+56-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:23:42-74
+57            <intent-filter>
+57-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:26:4-30:20
+58                <action android:name="android.intent.action.MAIN" />
+58-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:27:5-56
+58-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:27:13-54
+59
+60                <category android:name="android.intent.category.LAUNCHER" />
+60-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:28:5-64
+60-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:28:15-62
+61                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+61-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:29:5-74
+61-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:29:15-71
+62            </intent-filter>
+63        </activity>
+64        <activity
+64-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:32:3-79
+65            android:name="hev.sockstun.AppListActivity"
+65-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:32:13-44
+66            android:label="@string/app_name" />
+66-->/Users/jenny/Downloads/sockstun-3.0/app/src/main/AndroidManifest.xml:32:45-77
+67
+68        <provider
+68-->[androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:26:9-34:20
+69            android:name="androidx.startup.InitializationProvider"
+69-->[androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:27:13-67
+70            android:authorities="hev.sockstun.androidx-startup"
+70-->[androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:28:13-68
+71            android:exported="false" >
+71-->[androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:29:13-37
+72            <meta-data
+72-->[androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:31:13-33:52
+73                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+73-->[androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:32:17-75
+74                android:value="androidx.startup" />
+74-->[androidx.emoji2:emoji2:1.0.0] /Users/jenny/.gradle/caches/8.8/transforms/06035f1a35e234b9d8c3513daa1272cf/transformed/jetified-emoji2-1.0.0/AndroidManifest.xml:33:17-49
+75            <meta-data
+75-->[androidx.lifecycle:lifecycle-process:2.4.0] /Users/jenny/.gradle/caches/8.8/transforms/17ed51b0bf999c1ae5095aaf37139e07/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:31:13-33:52
+76                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+76-->[androidx.lifecycle:lifecycle-process:2.4.0] /Users/jenny/.gradle/caches/8.8/transforms/17ed51b0bf999c1ae5095aaf37139e07/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:32:17-78
+77                android:value="androidx.startup" />
+77-->[androidx.lifecycle:lifecycle-process:2.4.0] /Users/jenny/.gradle/caches/8.8/transforms/17ed51b0bf999c1ae5095aaf37139e07/transformed/jetified-lifecycle-process-2.4.0/AndroidManifest.xml:33:17-49
+78        </provider>
+79    </application>
+80
+81</manifest>
