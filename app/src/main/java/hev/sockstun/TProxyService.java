@@ -330,11 +330,7 @@ public class TProxyService extends VpnService {
 		stopForeground(true);
 		Log.d(TAG, "前台服务已停止");
 
-		// 2. 停止 TProxy 服务
-		TProxyStopService();
-		Log.d(TAG, "TProxy服务已停止");
-
-		// 3. 关闭 VPN 连接
+		// 2. 关闭 VPN 连接
 		try {
 			tunFd.close();
 			Log.d(TAG, "VPN连接已关闭");
@@ -343,9 +339,25 @@ public class TProxyService extends VpnService {
 		}
 		tunFd = null;
 
-		// 4. 停止自身服务
-		stopSelf();
-		Log.d(TAG, "VPN服务已停止");
+		// 3. 在后台线程中停止 TProxy 服务
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Log.d(TAG, "在后台线程中停止 TProxy 服务");
+					TProxyStopService();
+					Log.d(TAG, "TProxy服务已停止");
+					
+					// 4. 停止自身服务
+					stopSelf();
+					Log.d(TAG, "VPN服务已停止");
+				} catch (Exception e) {
+					Log.e(TAG, "停止服务时发生错误: " + e.getMessage());
+					Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
+					stopSelf();
+				}
+			}
+		}).start();
 	}
 
 	private void createNotification(String channelName) {
