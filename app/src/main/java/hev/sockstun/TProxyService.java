@@ -296,6 +296,15 @@ public class TProxyService extends VpnService {
 				return;
 			}
 			
+			// 调试信息：打印fd对象的类型和可用方法
+			Log.d(TAG, "VPN连接对象类型: " + fd.getClass().getName());
+			Method[] methods = fd.getClass().getMethods();
+			Log.d(TAG, "VPN连接对象可用方法:");
+			for (Method method : methods) {
+				Log.d(TAG, "  - " + method.getName() + "(" + 
+					Arrays.toString(method.getParameterTypes()) + ")");
+			}
+			
 			// 获取文件描述符
 			try {
 				if (isHarmonyOS()) {
@@ -304,6 +313,15 @@ public class TProxyService extends VpnService {
 					// 获取 VpnInterface 实例
 					Class<?> vpnInterfaceClass = Class.forName("ohos.net.VpnInterface");
 					Object vpnInterface = fd.getClass().getMethod("getInterface").invoke(fd);
+					
+					// 调试信息：打印VpnInterface对象的类型和可用方法
+					Log.d(TAG, "VpnInterface对象类型: " + vpnInterface.getClass().getName());
+					Method[] vpnInterfaceMethods = vpnInterface.getClass().getMethods();
+					Log.d(TAG, "VpnInterface对象可用方法:");
+					for (Method method : vpnInterfaceMethods) {
+						Log.d(TAG, "  - " + method.getName() + "(" + 
+							Arrays.toString(method.getParameterTypes()) + ")");
+					}
 					
 					// 获取文件描述符
 					Method getFdMethod = vpnInterfaceClass.getMethod("getFd");
