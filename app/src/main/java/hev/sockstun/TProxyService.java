@@ -44,8 +44,8 @@ public class TProxyService extends VpnService {
 
 	// 添加VPN服务类名常量
 	private static final String ANDROID_VPN_SERVICE = "android.net.VpnService";
-	private static final String HARMONY_VPN_SERVICE = "ohos.net.VpnInterface";
-	private static final String HARMONY_VPN_BUILDER = "ohos.net.VpnInterface$Builder";
+	private static final String HARMONY_VPN_SERVICE = "com.huawei.net.VpnInterface";
+	private static final String HARMONY_VPN_BUILDER = "com.huawei.net.VpnInterface$Builder";
 	
 	// 添加VPN服务实例
 	private Object vpnService = null;
@@ -72,12 +72,34 @@ public class TProxyService extends VpnService {
 				Log.i(TAG, "正在初始化鸿蒙VPN服务...");
 				// 加载鸿蒙VPN服务类
 				try {
-					vpnServiceClass = Class.forName(HARMONY_VPN_SERVICE);
-					Log.i(TAG, "成功加载鸿蒙VPN服务类: " + HARMONY_VPN_SERVICE);
+					// 尝试加载不同包名的VPN服务类
+					String[] vpnServiceClasses = {
+						"com.huawei.net.VpnInterface",
+						"ohos.net.VpnInterface",
+						"com.huawei.net.VpnService",
+						"ohos.net.VpnService"
+					};
 					
-					// 加载鸿蒙VPN Builder类
-					vpnBuilderClass = Class.forName(HARMONY_VPN_BUILDER);
-					Log.i(TAG, "成功加载鸿蒙VPN Builder类: " + HARMONY_VPN_BUILDER);
+					ClassNotFoundException lastException = null;
+					for (String className : vpnServiceClasses) {
+						try {
+							vpnServiceClass = Class.forName(className);
+							Log.i(TAG, "成功加载鸿蒙VPN服务类: " + className);
+							
+							// 尝试加载对应的Builder类
+							String builderClassName = className + "$Builder";
+							vpnBuilderClass = Class.forName(builderClassName);
+							Log.i(TAG, "成功加载鸿蒙VPN Builder类: " + builderClassName);
+							break;
+						} catch (ClassNotFoundException e) {
+							lastException = e;
+							Log.d(TAG, "尝试加载VPN服务类失败: " + className);
+						}
+					}
+					
+					if (vpnServiceClass == null || vpnBuilderClass == null) {
+						throw lastException;
+					}
 				} catch (ClassNotFoundException e) {
 					Log.e(TAG, "加载鸿蒙VPN服务类失败: " + e.getMessage());
 					throw e;
