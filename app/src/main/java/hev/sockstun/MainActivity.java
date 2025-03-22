@@ -25,11 +25,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.net.VpnService;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
 import java.util.Locale;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class MainActivity extends Activity implements View.OnClickListener {
     private Preferences prefs;
@@ -101,6 +104,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             startActivityForResult(intent, 0);
         else
             onActivityResult(0, RESULT_OK, null);
+
+        initViews();
     }
 
     @Override
@@ -303,5 +308,55 @@ public class MainActivity extends Activity implements View.OnClickListener {
         prefs.setIpv6(checkbox_ipv6.isChecked());
         prefs.setGlobal(checkbox_global.isChecked());
         prefs.setUdpInTcp(checkbox_udp_in_tcp.isChecked());
+    }
+
+    private void initViews() {
+        // 添加测试按钮
+        Button testButton = new Button(this);
+        testButton.setText("测试VPN连接");
+        testButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            URL url = new URL("https://www.youtube.com");
+                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                            connection.setConnectTimeout(5000);
+                            connection.setReadTimeout(5000);
+                            int responseCode = connection.getResponseCode();
+                            
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (responseCode == 200) {
+                                        Toast.makeText(MainActivity.this, "VPN连接测试成功！", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(MainActivity.this, "VPN连接测试失败，响应码：" + responseCode, Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        } catch (Exception e) {
+                            final String errorMsg = e.getMessage();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(MainActivity.this, "VPN连接测试失败：" + errorMsg, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+               	}).start();
+            }
+       	});
+        
+        // 将测试按钮添加到布局中
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0, 10, 0, 10);
+        ((LinearLayout) findViewById(R.id.main_layout)).addView(testButton, params);
     }
 }
