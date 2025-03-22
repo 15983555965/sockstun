@@ -44,8 +44,8 @@ public class TProxyService extends VpnService {
 
 	// 添加VPN服务类名常量
 	private static final String ANDROID_VPN_SERVICE = "android.net.VpnService";
-	private static final String HARMONY_VPN_SERVICE = "ohos.net.VpnService";
-	private static final String HARMONY_VPN_BUILDER = "ohos.net.VpnService$Builder";
+	private static final String HARMONY_VPN_SERVICE = "ohos.net.VpnInterface";
+	private static final String HARMONY_VPN_BUILDER = "ohos.net.VpnInterface$Builder";
 	
 	// 添加VPN服务实例
 	private Object vpnService = null;
@@ -85,18 +85,25 @@ public class TProxyService extends VpnService {
 				
 				// 创建鸿蒙VPN服务实例
 				try {
-					// 获取VPN服务实例
-					Method getInstanceMethod = vpnServiceClass.getMethod("getInstance", Context.class);
-					vpnService = getInstanceMethod.invoke(null, this);
-					Log.i(TAG, "成功获取鸿蒙VPN服务实例");
+					// 创建VPN Builder实例
+					Method newBuilderMethod = vpnServiceClass.getMethod("newBuilder");
+					Object builder = newBuilderMethod.invoke(null);
+					Log.i(TAG, "成功创建鸿蒙VPN Builder实例");
 					
-					// 检查VPN服务是否可用
-					Method isAvailableMethod = vpnServiceClass.getMethod("isAvailable");
-					boolean isAvailable = (boolean) isAvailableMethod.invoke(vpnService);
-					Log.i(TAG, "鸿蒙VPN服务可用状态: " + isAvailable);
+					// 设置VPN配置
+					Method setMtuMethod = vpnBuilderClass.getMethod("setMtu", int.class);
+					setMtuMethod.invoke(builder, 1500);
 					
-					if (!isAvailable) {
-						throw new Exception("鸿蒙VPN服务不可用");
+					Method setBlockingMethod = vpnBuilderClass.getMethod("setBlocking", boolean.class);
+					setBlockingMethod.invoke(builder, true);
+					
+					// 建立VPN连接
+					Method establishMethod = vpnBuilderClass.getMethod("establish");
+					vpnService = establishMethod.invoke(builder);
+					Log.i(TAG, "成功建立鸿蒙VPN连接");
+					
+					if (vpnService == null) {
+						throw new Exception("VPN连接建立失败");
 					}
 				} catch (Exception e) {
 					Log.e(TAG, "创建鸿蒙VPN服务实例失败: " + e.getMessage());
