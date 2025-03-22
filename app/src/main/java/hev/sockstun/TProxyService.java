@@ -213,7 +213,7 @@ public class TProxyService extends VpnService {
 		try {
 			// 使用反射创建VPN Builder
 			Class<?> builderClass = vpnServiceClass.getDeclaredClasses()[0];
-			Object builder = builderClass.newInstance();
+			Object builder = builderClass.getConstructor(vpnServiceClass).newInstance(this);
 			
 			// 设置VPN配置
 			if (isHarmonyOS()) {
@@ -226,6 +226,9 @@ public class TProxyService extends VpnService {
 				builderClass.getMethod("setMtu", int.class).invoke(builder, prefs.getTunnelMtu());
 			}
 
+			// 设置会话名称
+			builderClass.getMethod("setSession", String.class).invoke(builder, "SocksTun");
+			
 			// IPv4配置
 			if (prefs.getIpv4()) {
 				String addr = prefs.getTunnelIpv4Address();
