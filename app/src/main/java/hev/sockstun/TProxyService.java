@@ -62,41 +62,80 @@ public class TProxyService extends VpnService {
 	 */
 	private void initVpnService() {
 		try {
+			Log.d(TAG, "开始初始化VPN服务...");
+			Log.d(TAG, "当前系统类型: " + (isHarmonyOS() ? "鸿蒙系统" : "Android系统"));
+			
 			if (isHarmonyOS()) {
 				// 使用鸿蒙VPN服务
 				Log.i(TAG, "正在初始化鸿蒙VPN服务...");
 				// 加载鸿蒙VPN服务类
-				vpnServiceClass = Class.forName(HARMONY_VPN_SERVICE);
-				Log.i(TAG, "成功加载鸿蒙VPN服务类: " + HARMONY_VPN_SERVICE);
+				try {
+					vpnServiceClass = Class.forName(HARMONY_VPN_SERVICE);
+					Log.i(TAG, "成功加载鸿蒙VPN服务类: " + HARMONY_VPN_SERVICE);
+				} catch (ClassNotFoundException e) {
+					Log.e(TAG, "加载鸿蒙VPN服务类失败: " + e.getMessage());
+					throw e;
+				}
 				
 				// 获取鸿蒙VPN服务实例
-				Method getInstanceMethod = vpnServiceClass.getMethod("getInstance", Context.class);
-				vpnService = getInstanceMethod.invoke(null, this);
-				Log.i(TAG, "成功获取鸿蒙VPN服务实例");
+				try {
+					Method getInstanceMethod = vpnServiceClass.getMethod("getInstance", Context.class);
+					vpnService = getInstanceMethod.invoke(null, this);
+					Log.i(TAG, "成功获取鸿蒙VPN服务实例");
+				} catch (Exception e) {
+					Log.e(TAG, "获取鸿蒙VPN服务实例失败: " + e.getMessage());
+					throw e;
+				}
 				
 				// 检查VPN服务是否可用
-				Method isAvailableMethod = vpnServiceClass.getMethod("isAvailable");
-				boolean isAvailable = (boolean) isAvailableMethod.invoke(vpnService);
-				Log.i(TAG, "鸿蒙VPN服务可用状态: " + isAvailable);
-				
-				if (!isAvailable) {
-					throw new Exception("鸿蒙VPN服务不可用");
+				try {
+					Method isAvailableMethod = vpnServiceClass.getMethod("isAvailable");
+					boolean isAvailable = (boolean) isAvailableMethod.invoke(vpnService);
+					Log.i(TAG, "鸿蒙VPN服务可用状态: " + isAvailable);
+					
+					if (!isAvailable) {
+						throw new Exception("鸿蒙VPN服务不可用");
+					}
+				} catch (Exception e) {
+					Log.e(TAG, "检查鸿蒙VPN服务可用性失败: " + e.getMessage());
+					throw e;
 				}
 			} else {
 				// 使用Android VPN服务
 				Log.i(TAG, "正在初始化Android VPN服务...");
-				vpnServiceClass = Class.forName(ANDROID_VPN_SERVICE);
-				Log.i(TAG, "成功加载Android VPN服务类: " + ANDROID_VPN_SERVICE);
+				try {
+					vpnServiceClass = Class.forName(ANDROID_VPN_SERVICE);
+					Log.i(TAG, "成功加载Android VPN服务类: " + ANDROID_VPN_SERVICE);
+				} catch (ClassNotFoundException e) {
+					Log.e(TAG, "加载Android VPN服务类失败: " + e.getMessage());
+					throw e;
+				}
 				
 				// 创建Android VPN服务实例
-				vpnService = vpnServiceClass.newInstance();
-				Log.i(TAG, "成功创建Android VPN服务实例");
+				try {
+					vpnService = vpnServiceClass.newInstance();
+					Log.i(TAG, "成功创建Android VPN服务实例");
+				} catch (Exception e) {
+					Log.e(TAG, "创建Android VPN服务实例失败: " + e.getMessage());
+					throw e;
+				}
+			}
+			
+			// 验证初始化结果
+			if (vpnServiceClass == null) {
+				throw new Exception("VPN服务类初始化失败");
+			}
+			if (vpnService == null) {
+				throw new Exception("VPN服务实例初始化失败");
 			}
 			
 			Log.i(TAG, "VPN服务初始化成功");
 		} catch (Exception e) {
 			Log.e(TAG, "VPN服务初始化失败: " + e.getMessage());
 			Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
+			// 重置变量
+			vpnServiceClass = null;
+			vpnService = null;
 		}
 	}
 
