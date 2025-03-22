@@ -44,8 +44,8 @@ public class TProxyService extends VpnService {
 
 	// 添加VPN服务类名常量
 	private static final String ANDROID_VPN_SERVICE = "android.net.VpnService";
-	private static final String HARMONY_VPN_SERVICE = "ohos.net.VpnInterface";
-	private static final String HARMONY_VPN_BUILDER = "ohos.net.VpnInterface$Builder";
+	private static final String HARMONY_VPN_SERVICE = "ohos.net.VpnService";
+	private static final String HARMONY_VPN_BUILDER = "ohos.net.VpnService$Builder";
 	
 	// 添加VPN服务实例
 	private Object vpnService = null;
@@ -85,18 +85,19 @@ public class TProxyService extends VpnService {
 				
 				// 创建鸿蒙VPN服务实例
 				try {
-					Method newBuilderMethod = vpnServiceClass.getMethod("newBuilder");
-					Object builder = newBuilderMethod.invoke(null);
-					Log.i(TAG, "成功创建鸿蒙VPN Builder实例");
+					// 获取VPN服务实例
+					Method getInstanceMethod = vpnServiceClass.getMethod("getInstance", Context.class);
+					vpnService = getInstanceMethod.invoke(null, this);
+					Log.i(TAG, "成功获取鸿蒙VPN服务实例");
 					
-					// 设置VPN配置
-					Method setMtuMethod = vpnBuilderClass.getMethod("setMtu", int.class);
-					setMtuMethod.invoke(builder, 1500);
+					// 检查VPN服务是否可用
+					Method isAvailableMethod = vpnServiceClass.getMethod("isAvailable");
+					boolean isAvailable = (boolean) isAvailableMethod.invoke(vpnService);
+					Log.i(TAG, "鸿蒙VPN服务可用状态: " + isAvailable);
 					
-					// 建立VPN连接
-					Method establishMethod = vpnBuilderClass.getMethod("establish");
-					vpnService = establishMethod.invoke(builder);
-					Log.i(TAG, "成功建立鸿蒙VPN连接");
+					if (!isAvailable) {
+						throw new Exception("鸿蒙VPN服务不可用");
+					}
 				} catch (Exception e) {
 					Log.e(TAG, "创建鸿蒙VPN服务实例失败: " + e.getMessage());
 					throw e;
@@ -149,9 +150,11 @@ public class TProxyService extends VpnService {
 		try {
 			Class<?> buildExClass = Class.forName("com.huawei.system.BuildEx");
 			Object osBrand = buildExClass.getMethod("getOsBrand").invoke(buildExClass);
-			return "harmony".equalsIgnoreCase(osBrand.toString());
+			String brand = osBrand.toString().toLowerCase();
+			Log.d(TAG, "系统品牌: " + brand);
+			return "harmony".equals(brand);
 		} catch (Exception e) {
-			Log.d(TAG, "Not running on HarmonyOS");
+			Log.d(TAG, "Not running on HarmonyOS: " + e.getMessage());
 			return false;
 		}
 	}
@@ -272,173 +275,241 @@ public class TProxyService extends VpnService {
 		Preferences prefs = new Preferences(this);
 
 		try {
-			// 使用反射创建VPN Builder
-			Class<?> builderClass = vpnServiceClass.getDeclaredClasses()[0];
-			Object builder = builderClass.getConstructor(vpnServiceClass).newInstance(this);
-			
-			// 设置VPN配置
 			if (isHarmonyOS()) {
+				// 鸿蒙系统VPN配置
 				Log.d(TAG, "Configuring VPN for HarmonyOS");
-				builderClass.getMethod("setBlocking", boolean.class).invoke(builder, true);
-				builderClass.getMethod("setMtu", int.class).invoke(builder, 1500);
-			} else {
-				Log.d(TAG, "Configuring VPN for Android");
-				builderClass.getMethod("setBlocking", boolean.class).invoke(builder, false);
-				builderClass.getMethod("setMtu", int.class).invoke(builder, prefs.getTunnelMtu());
-			}
+				try {
+					// 创建VPN Builder
+					Method newBuilderMethod = vpnServiceClass.getMethod("newBuilder");
+					Object builder = newBuilderMethod.invoke(null);
+					Log.d(TAG, "成功创建鸿蒙VPN Builder");
 
-			// 设置会话名称
-			builderClass.getMethod("setSession", String.class).invoke(builder, "SocksTun");
-			
-			// IPv4配置
-			if (prefs.getIpv4()) {
-				String addr = prefs.getTunnelIpv4Address();
-				int prefix = prefs.getTunnelIpv4Prefix();
-				String dns = prefs.getDnsIpv4();
-				builderClass.getMethod("addAddress", String.class, int.class).invoke(builder, addr, prefix);
-				builderClass.getMethod("addRoute", String.class, int.class).invoke(builder, "0.0.0.0", 0);
-				if (!dns.isEmpty())
-					builderClass.getMethod("addDnsServer", String.class).invoke(builder, dns);
-			}
-
-			// IPv6配置
-			if (prefs.getIpv6()) {
-				String addr = prefs.getTunnelIpv6Address();
-				int prefix = prefs.getTunnelIpv6Prefix();
-				String dns = prefs.getDnsIpv6();
-				builderClass.getMethod("addAddress", String.class, int.class).invoke(builder, addr, prefix);
-				builderClass.getMethod("addRoute", String.class, int.class).invoke(builder, "::", 0);
-				if (!dns.isEmpty())
-					builderClass.getMethod("addDnsServer", String.class).invoke(builder, dns);
-			}
-
-			// 应用过滤配置
-			if (prefs.getGlobal()) {
-				Log.d(TAG, "使用全局模式 - 所有应用允许");
-				builderClass.getMethod("allowAll").invoke(builder);
-			} else {
-				Log.d(TAG, "使用应用过滤模式");
-				for (String appName : prefs.getApps()) {
-					try {
-						builderClass.getMethod("addAllowedApplication", String.class).invoke(builder, appName);
-						Log.d(TAG, "添加应用到允许列表: " + appName);
-					} catch (Exception e) {
-						Log.e(TAG, "应用未找到: " + appName);
-					}
-				}
-			}
-
-			// 建立VPN连接
-			Log.d(TAG, "开始建立VPN连接...");
-			Object fd = builderClass.getMethod("establish").invoke(builder);
-			if (fd == null) {
-				Log.e(TAG, "VPN连接建立失败");
-				stopSelf();
-				return;
-			}
-			
-			// 调试信息：打印fd对象的类型和可用方法
-			Log.d(TAG, "VPN连接对象类型: " + fd.getClass().getName());
-			Method[] methods = fd.getClass().getMethods();
-			Log.d(TAG, "VPN连接对象可用方法:");
-			for (Method method : methods) {
-				Log.d(TAG, "  - " + method.getName() + "(" + 
-					Arrays.toString(method.getParameterTypes()) + ")");
-			}
-			
-			// 获取文件描述符
-			try {
-				if (isHarmonyOS()) {
-					// 鸿蒙系统使用 VpnInterface
-					Log.d(TAG, "鸿蒙系统：使用 VpnInterface");
-					// 获取 VpnInterface 实例
-					Class<?> vpnInterfaceClass = Class.forName("ohos.net.VpnInterface");
-					Object vpnInterface = fd.getClass().getMethod("getInterface").invoke(fd);
+					// 设置基本配置
+					Method setMtuMethod = vpnBuilderClass.getMethod("setMtu", int.class);
+					setMtuMethod.invoke(builder, 1500);
 					
-					// 调试信息：打印VpnInterface对象的类型和可用方法
-					Log.d(TAG, "VpnInterface对象类型: " + vpnInterface.getClass().getName());
-					Method[] vpnInterfaceMethods = vpnInterface.getClass().getMethods();
-					Log.d(TAG, "VpnInterface对象可用方法:");
-					for (Method method : vpnInterfaceMethods) {
-						Log.d(TAG, "  - " + method.getName() + "(" + 
-							Arrays.toString(method.getParameterTypes()) + ")");
-					}
+					Method setBlockingMethod = vpnBuilderClass.getMethod("setBlocking", boolean.class);
+					setBlockingMethod.invoke(builder, true);
 					
+					Method setSessionMethod = vpnBuilderClass.getMethod("setSession", String.class);
+					setSessionMethod.invoke(builder, "SocksTun");
+
+					// IPv4配置
+					if (prefs.getIpv4()) {
+						String addr = prefs.getTunnelIpv4Address();
+						int prefix = prefs.getTunnelIpv4Prefix();
+						String dns = prefs.getDnsIpv4();
+						
+						Method addAddressMethod = vpnBuilderClass.getMethod("addAddress", String.class, int.class);
+						addAddressMethod.invoke(builder, addr, prefix);
+						
+						Method addRouteMethod = vpnBuilderClass.getMethod("addRoute", String.class, int.class);
+						addRouteMethod.invoke(builder, "0.0.0.0", 0);
+						
+						if (!dns.isEmpty()) {
+							Method addDnsServerMethod = vpnBuilderClass.getMethod("addDnsServer", String.class);
+							addDnsServerMethod.invoke(builder, dns);
+						}
+					}
+
+					// IPv6配置
+					if (prefs.getIpv6()) {
+						String addr = prefs.getTunnelIpv6Address();
+						int prefix = prefs.getTunnelIpv6Prefix();
+						String dns = prefs.getDnsIpv6();
+						
+						Method addAddressMethod = vpnBuilderClass.getMethod("addAddress", String.class, int.class);
+						addAddressMethod.invoke(builder, addr, prefix);
+						
+						Method addRouteMethod = vpnBuilderClass.getMethod("addRoute", String.class, int.class);
+						addRouteMethod.invoke(builder, "::", 0);
+						
+						if (!dns.isEmpty()) {
+							Method addDnsServerMethod = vpnBuilderClass.getMethod("addDnsServer", String.class);
+							addDnsServerMethod.invoke(builder, dns);
+						}
+					}
+
+					// 应用过滤配置
+					if (prefs.getGlobal()) {
+						Log.d(TAG, "使用全局模式 - 所有应用允许");
+						Method allowAllMethod = vpnBuilderClass.getMethod("allowAll");
+						allowAllMethod.invoke(builder);
+					} else {
+						Log.d(TAG, "使用应用过滤模式");
+						Method addAllowedApplicationMethod = vpnBuilderClass.getMethod("addAllowedApplication", String.class);
+						for (String appName : prefs.getApps()) {
+							try {
+								addAllowedApplicationMethod.invoke(builder, appName);
+								Log.d(TAG, "添加应用到允许列表: " + appName);
+							} catch (Exception e) {
+								Log.e(TAG, "应用未找到: " + appName);
+							}
+						}
+					}
+
+					// 建立VPN连接
+					Log.d(TAG, "开始建立鸿蒙VPN连接...");
+					Method establishMethod = vpnBuilderClass.getMethod("establish");
+					Object fd = establishMethod.invoke(builder);
+					
+					if (fd == null) {
+						Log.e(TAG, "VPN连接建立失败");
+						stopSelf();
+						return;
+					}
+
 					// 获取文件描述符
-					Method getFdMethod = vpnInterfaceClass.getMethod("getFd");
-					int fdInt = (int) getFdMethod.invoke(vpnInterface);
+					Method getFdMethod = fd.getClass().getMethod("getFd");
+					int fdInt = (int) getFdMethod.invoke(fd);
 					Log.d(TAG, "获取到文件描述符值: " + fdInt);
-					
+
 					// 创建 ParcelFileDescriptor
 					Class<?> pfdClass = Class.forName("android.os.ParcelFileDescriptor");
 					Method fromFdMethod = pfdClass.getMethod("fromFd", int.class);
 					tunFd = (ParcelFileDescriptor) fromFdMethod.invoke(null, fdInt);
+					Log.d(TAG, "VPN连接建立成功");
+				} catch (Exception e) {
+					Log.e(TAG, "鸿蒙VPN配置失败: " + e.getMessage());
+					Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
+					stopSelf();
+					return;
+				}
+			} else {
+				// Android系统VPN配置
+				// 使用反射创建VPN Builder
+				Class<?> builderClass = vpnServiceClass.getDeclaredClasses()[0];
+				Object builder = builderClass.getConstructor(vpnServiceClass).newInstance(this);
+				
+				// 设置VPN配置
+				builderClass.getMethod("setBlocking", boolean.class).invoke(builder, false);
+				builderClass.getMethod("setMtu", int.class).invoke(builder, prefs.getTunnelMtu());
+
+				// 设置会话名称
+				builderClass.getMethod("setSession", String.class).invoke(builder, "SocksTun");
+				
+				// IPv4配置
+				if (prefs.getIpv4()) {
+					String addr = prefs.getTunnelIpv4Address();
+					int prefix = prefs.getTunnelIpv4Prefix();
+					String dns = prefs.getDnsIpv4();
+					builderClass.getMethod("addAddress", String.class, int.class).invoke(builder, addr, prefix);
+					builderClass.getMethod("addRoute", String.class, int.class).invoke(builder, "0.0.0.0", 0);
+					if (!dns.isEmpty())
+						builderClass.getMethod("addDnsServer", String.class).invoke(builder, dns);
+				}
+
+				// IPv6配置
+				if (prefs.getIpv6()) {
+					String addr = prefs.getTunnelIpv6Address();
+					int prefix = prefs.getTunnelIpv6Prefix();
+					String dns = prefs.getDnsIpv6();
+					builderClass.getMethod("addAddress", String.class, int.class).invoke(builder, addr, prefix);
+					builderClass.getMethod("addRoute", String.class, int.class).invoke(builder, "::", 0);
+					if (!dns.isEmpty())
+						builderClass.getMethod("addDnsServer", String.class).invoke(builder, dns);
+				}
+
+				// 应用过滤配置
+				if (prefs.getGlobal()) {
+					Log.d(TAG, "使用全局模式 - 所有应用允许");
+					builderClass.getMethod("allowAll").invoke(builder);
 				} else {
+					Log.d(TAG, "使用应用过滤模式");
+					for (String appName : prefs.getApps()) {
+						try {
+							builderClass.getMethod("addAllowedApplication", String.class).invoke(builder, appName);
+							Log.d(TAG, "添加应用到允许列表: " + appName);
+						} catch (Exception e) {
+							Log.e(TAG, "应用未找到: " + appName);
+						}
+					}
+				}
+
+				// 建立VPN连接
+				Log.d(TAG, "开始建立VPN连接...");
+				Object fd = builderClass.getMethod("establish").invoke(builder);
+				if (fd == null) {
+					Log.e(TAG, "VPN连接建立失败");
+					stopSelf();
+					return;
+				}
+				
+				// 调试信息：打印fd对象的类型和可用方法
+				Log.d(TAG, "VPN连接对象类型: " + fd.getClass().getName());
+				Method[] methods = fd.getClass().getMethods();
+				Log.d(TAG, "VPN连接对象可用方法:");
+				for (Method method : methods) {
+					Log.d(TAG, "  - " + method.getName() + "(" + 
+						Arrays.toString(method.getParameterTypes()) + ")");
+				}
+				
+				// 获取文件描述符
+				try {
 					// Android 系统直接获取 ParcelFileDescriptor
 					Log.d(TAG, "Android系统：使用 ParcelFileDescriptor");
 					tunFd = (ParcelFileDescriptor) fd.getClass().getMethod("getFileDescriptor").invoke(fd);
-				}
-				Log.d(TAG, "VPN连接建立成功");
-			} catch (Exception e) {
-				Log.e(TAG, "获取文件描述符失败: " + e.getMessage());
-				Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
-				stopSelf();
-				return;
-			}
-
-			// 启动TProxy服务
-			File tproxy_file = new File(getCacheDir(), "tproxy.conf");
-			try {
-				Log.d(TAG, "创建TProxy配置文件...");
-				tproxy_file.createNewFile();
-				FileOutputStream fos = new FileOutputStream(tproxy_file, false);
-
-				String tproxy_conf = "misc:\n" +
-					"  task-stack-size: " + prefs.getTaskStackSize() + "\n" +
-					"tunnel:\n" +
-					"  mtu: " + prefs.getTunnelMtu() + "\n";
-
-				tproxy_conf += "socks5:\n" +
-					"  port: " + prefs.getSocksPort() + "\n" +
-					"  address: '" + prefs.getSocksAddress() + "'\n" +
-					"  udp: '" + (prefs.getUdpInTcp() ? "tcp" : "udp") + "'\n";
-
-				if (!prefs.getSocksUsername().isEmpty() &&
-					!prefs.getSocksPassword().isEmpty()) {
-					tproxy_conf += "  username: '" + prefs.getSocksUsername() + "'\n";
-					tproxy_conf += "  password: '" + prefs.getSocksPassword() + "'\n";
+				} catch (Exception e) {
+					Log.e(TAG, "获取文件描述符失败: " + e.getMessage());
+					Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
+					stopSelf();
+					return;
 				}
 
-				Log.d(TAG, "TProxy配置文件路径: " + tproxy_file.getAbsolutePath());
-				Log.d(TAG, "TProxy配置内容:\n" + tproxy_conf);
+				// 启动TProxy服务
+				File tproxy_file = new File(getCacheDir(), "tproxy.conf");
+				try {
+					Log.d(TAG, "创建TProxy配置文件...");
+					tproxy_file.createNewFile();
+					FileOutputStream fos = new FileOutputStream(tproxy_file, false);
+
+					String tproxy_conf = "misc:\n" +
+						"  task-stack-size: " + prefs.getTaskStackSize() + "\n" +
+						"tunnel:\n" +
+						"  mtu: " + prefs.getTunnelMtu() + "\n";
+
+					tproxy_conf += "socks5:\n" +
+						"  port: " + prefs.getSocksPort() + "\n" +
+						"  address: '" + prefs.getSocksAddress() + "'\n" +
+						"  udp: '" + (prefs.getUdpInTcp() ? "tcp" : "udp") + "'\n";
+
+					if (!prefs.getSocksUsername().isEmpty() &&
+						!prefs.getSocksPassword().isEmpty()) {
+						tproxy_conf += "  username: '" + prefs.getSocksUsername() + "'\n";
+						tproxy_conf += "  password: '" + prefs.getSocksPassword() + "'\n";
+					}
+
+					Log.d(TAG, "TProxy配置文件路径: " + tproxy_file.getAbsolutePath());
+					Log.d(TAG, "TProxy配置内容:\n" + tproxy_conf);
+					
+					fos.write(tproxy_conf.getBytes());
+					fos.close();
+					Log.d(TAG, "TProxy配置文件写入成功");
+				} catch (IOException e) {
+					Log.e(TAG, "创建TProxy配置文件失败: " + e.getMessage());
+					Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
+					return;
+				}
+
+				Log.d(TAG, "启动TProxy服务...");
+				try {
+					Log.d(TAG, "启动TProxy服务");
+					TProxyStartService(tproxy_file.getAbsolutePath(), tunFd.getFd());
+					Log.d(TAG, "TProxy服务启动成功");
+					prefs.setEnable(true);
+				} catch (Exception e) {
+					Log.e(TAG, "TProxy服务启动失败: " + e.getMessage());
+					Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
+					stopSelf();
+					return;
+				}
+
+				String channelName = "socks5";
+				initNotificationChannel(channelName);
+				createNotification(channelName);
 				
-				fos.write(tproxy_conf.getBytes());
-				fos.close();
-				Log.d(TAG, "TProxy配置文件写入成功");
-			} catch (IOException e) {
-				Log.e(TAG, "创建TProxy配置文件失败: " + e.getMessage());
-				Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
-				return;
+				Log.d(TAG, "VPN service started successfully");
 			}
-
-			Log.d(TAG, "启动TProxy服务...");
-			try {
-				Log.d(TAG, "启动TProxy服务");
-				TProxyStartService(tproxy_file.getAbsolutePath(), tunFd.getFd());
-				Log.d(TAG, "TProxy服务启动成功");
-				prefs.setEnable(true);
-			} catch (Exception e) {
-				Log.e(TAG, "TProxy服务启动失败: " + e.getMessage());
-				Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
-				stopSelf();
-				return;
-			}
-
-			String channelName = "socks5";
-			initNotificationChannel(channelName);
-			createNotification(channelName);
-			
-			Log.d(TAG, "VPN service started successfully");
 		} catch (Exception e) {
 			Log.e(TAG, "VPN错误: " + e.getMessage());
 			Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
