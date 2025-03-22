@@ -62,18 +62,37 @@ public class TProxyService extends VpnService {
 	 */
 	private void initVpnService() {
 		try {
-			// 尝试加载鸿蒙VPN服务
-			try {
+			if (isHarmonyOS()) {
+				// 使用鸿蒙VPN服务
+				Log.i(TAG, "正在初始化鸿蒙VPN服务...");
+				// 加载鸿蒙VPN服务类
 				vpnServiceClass = Class.forName(HARMONY_VPN_SERVICE);
-				Log.i(TAG, "成功加载鸿蒙VPN服务");
-			} catch (ClassNotFoundException e) {
-				// 如果加载失败，尝试加载Android VPN服务
+				Log.i(TAG, "成功加载鸿蒙VPN服务类: " + HARMONY_VPN_SERVICE);
+				
+				// 获取鸿蒙VPN服务实例
+				Method getInstanceMethod = vpnServiceClass.getMethod("getInstance", Context.class);
+				vpnService = getInstanceMethod.invoke(null, this);
+				Log.i(TAG, "成功获取鸿蒙VPN服务实例");
+				
+				// 检查VPN服务是否可用
+				Method isAvailableMethod = vpnServiceClass.getMethod("isAvailable");
+				boolean isAvailable = (boolean) isAvailableMethod.invoke(vpnService);
+				Log.i(TAG, "鸿蒙VPN服务可用状态: " + isAvailable);
+				
+				if (!isAvailable) {
+					throw new Exception("鸿蒙VPN服务不可用");
+				}
+			} else {
+				// 使用Android VPN服务
+				Log.i(TAG, "正在初始化Android VPN服务...");
 				vpnServiceClass = Class.forName(ANDROID_VPN_SERVICE);
-				Log.i(TAG, "成功加载Android VPN服务");
+				Log.i(TAG, "成功加载Android VPN服务类: " + ANDROID_VPN_SERVICE);
+				
+				// 创建Android VPN服务实例
+				vpnService = vpnServiceClass.newInstance();
+				Log.i(TAG, "成功创建Android VPN服务实例");
 			}
-
-			// 创建VPN服务实例
-			vpnService = vpnServiceClass.newInstance();
+			
 			Log.i(TAG, "VPN服务初始化成功");
 		} catch (Exception e) {
 			Log.e(TAG, "VPN服务初始化失败: " + e.getMessage());
@@ -280,17 +299,20 @@ public class TProxyService extends VpnService {
 			// 获取文件描述符
 			try {
 				if (isHarmonyOS()) {
-					// 鸿蒙系统直接使用 FileDescriptor
-					Log.d(TAG, "鸿蒙系统：使用 FileDescriptor");
-					Object fileDescriptor = fd.getClass().getMethod("getFileDescriptor").invoke(fd);
+					// 鸿蒙系统使用 VpnInterface
+					Log.d(TAG, "鸿蒙系统：使用 VpnInterface");
+					// 获取 VpnInterface 实例
+					Class<?> vpnInterfaceClass = Class.forName("ohos.net.VpnInterface");
+					Object vpnInterface = fd.getClass().getMethod("getInterface").invoke(fd);
+					
+					// 获取文件描述符
+					Method getFdMethod = vpnInterfaceClass.getMethod("getFd");
+					int fdInt = (int) getFdMethod.invoke(vpnInterface);
+					Log.d(TAG, "获取到文件描述符值: " + fdInt);
+					
 					// 创建 ParcelFileDescriptor
 					Class<?> pfdClass = Class.forName("android.os.ParcelFileDescriptor");
 					Method fromFdMethod = pfdClass.getMethod("fromFd", int.class);
-					// 使用反射获取文件描述符的原始值
-					Method getDescriptorMethod = fileDescriptor.getClass().getDeclaredMethod("getDescriptor");
-					getDescriptorMethod.setAccessible(true);
-					int fdInt = (int) getDescriptorMethod.invoke(fileDescriptor);
-					Log.d(TAG, "获取到文件描述符值: " + fdInt);
 					tunFd = (ParcelFileDescriptor) fromFdMethod.invoke(null, fdInt);
 				} else {
 					// Android 系统直接获取 ParcelFileDescriptor
