@@ -12,6 +12,7 @@ package hev.sockstun;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import android.app.NotificationChannel;
@@ -277,8 +278,28 @@ public class TProxyService extends VpnService {
 			}
 			
 			// 获取文件描述符
-			tunFd = (ParcelFileDescriptor) fd.getClass().getMethod("getFileDescriptor").invoke(fd);
-			Log.d(TAG, "VPN连接建立成功");
+			try {
+				if (isHarmonyOS()) {
+					// 鸿蒙系统直接使用 FileDescriptor
+					Log.d(TAG, "鸿蒙系统：使用 FileDescriptor");
+					Object fileDescriptor = fd.getClass().getMethod("getFileDescriptor").invoke(fd);
+					// 创建 ParcelFileDescriptor
+					Class<?> pfdClass = Class.forName("android.os.ParcelFileDescriptor");
+					Method fromFdMethod = pfdClass.getMethod("fromFd", int.class);
+					int fdInt = (int) fileDescriptor.getClass().getMethod("getInt").invoke(fileDescriptor);
+					tunFd = (ParcelFileDescriptor) fromFdMethod.invoke(null, fdInt);
+				} else {
+					// Android 系统直接获取 ParcelFileDescriptor
+					Log.d(TAG, "Android系统：使用 ParcelFileDescriptor");
+					tunFd = (ParcelFileDescriptor) fd.getClass().getMethod("getFileDescriptor").invoke(fd);
+				}
+				Log.d(TAG, "VPN连接建立成功");
+			} catch (Exception e) {
+				Log.e(TAG, "获取文件描述符失败: " + e.getMessage());
+				Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
+				stopSelf();
+				return;
+			}
 
 			// 启动TProxy服务
 			File tproxy_file = new File(getCacheDir(), "tproxy.conf");
