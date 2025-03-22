@@ -286,7 +286,11 @@ public class TProxyService extends VpnService {
 					// 创建 ParcelFileDescriptor
 					Class<?> pfdClass = Class.forName("android.os.ParcelFileDescriptor");
 					Method fromFdMethod = pfdClass.getMethod("fromFd", int.class);
-					int fdInt = (int) fileDescriptor.getClass().getMethod("getInt").invoke(fileDescriptor);
+					// 使用反射获取文件描述符的原始值
+					Method getDescriptorMethod = fileDescriptor.getClass().getDeclaredMethod("getDescriptor");
+					getDescriptorMethod.setAccessible(true);
+					int fdInt = (int) getDescriptorMethod.invoke(fileDescriptor);
+					Log.d(TAG, "获取到文件描述符值: " + fdInt);
 					tunFd = (ParcelFileDescriptor) fromFdMethod.invoke(null, fdInt);
 				} else {
 					// Android 系统直接获取 ParcelFileDescriptor
