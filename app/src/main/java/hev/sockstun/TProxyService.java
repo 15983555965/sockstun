@@ -324,21 +324,28 @@ public class TProxyService extends VpnService {
 			return;
 		}
 
+		Log.d(TAG, "开始停止VPN服务...");
+		
+		// 1. 停止前台服务
 		stopForeground(true);
+		Log.d(TAG, "前台服务已停止");
 
-		/* TProxy */
+		// 2. 停止 TProxy 服务
 		TProxyStopService();
+		Log.d(TAG, "TProxy服务已停止");
 
-		/* VPN */
+		// 3. 关闭 VPN 连接
 		try {
 			tunFd.close();
+			Log.d(TAG, "VPN连接已关闭");
 		} catch (IOException e) {
-			Log.e(TAG, "Error closing VPN connection: " + e.getMessage());
+			Log.e(TAG, "关闭VPN连接时发生错误: " + e.getMessage());
 		}
 		tunFd = null;
 
-		System.exit(0);
-		Log.d(TAG, "VPN service stopped");
+		// 4. 停止自身服务
+		stopSelf();
+		Log.d(TAG, "VPN服务已停止");
 	}
 
 	private void createNotification(String channelName) {
