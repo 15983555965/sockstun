@@ -77,28 +77,50 @@ public class TProxyService extends VpnService {
 						"com.huawei.net.VpnInterface",
 						"ohos.net.VpnInterface",
 						"com.huawei.net.VpnService",
-						"ohos.net.VpnService"
+						"ohos.net.VpnService",
+						"com.huawei.net.VpnManager",
+						"ohos.net.VpnManager"
 					};
 					
+					Log.d(TAG, "开始尝试加载VPN服务类...");
 					ClassNotFoundException lastException = null;
 					for (String className : vpnServiceClasses) {
 						try {
+							Log.d(TAG, "正在尝试加载类: " + className);
 							vpnServiceClass = Class.forName(className);
 							Log.i(TAG, "成功加载鸿蒙VPN服务类: " + className);
 							
 							// 尝试加载对应的Builder类
 							String builderClassName = className + "$Builder";
+							Log.d(TAG, "正在尝试加载Builder类: " + builderClassName);
 							vpnBuilderClass = Class.forName(builderClassName);
 							Log.i(TAG, "成功加载鸿蒙VPN Builder类: " + builderClassName);
+							
+							// 打印类的所有方法
+							Log.d(TAG, "VPN服务类可用方法:");
+							Method[] methods = vpnServiceClass.getMethods();
+							for (Method method : methods) {
+								Log.d(TAG, "  - " + method.getName() + "(" + 
+									Arrays.toString(method.getParameterTypes()) + ")");
+							}
+							
 							break;
 						} catch (ClassNotFoundException e) {
 							lastException = e;
-							Log.d(TAG, "尝试加载VPN服务类失败: " + className);
+							Log.d(TAG, "尝试加载VPN服务类失败: " + className + ", 错误: " + e.getMessage());
+						} catch (Exception e) {
+							Log.e(TAG, "加载类时发生其他错误: " + className + ", 错误: " + e.getMessage());
+							Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
 						}
 					}
 					
 					if (vpnServiceClass == null || vpnBuilderClass == null) {
-						throw lastException;
+						Log.e(TAG, "所有VPN服务类加载尝试都失败了");
+						if (lastException != null) {
+							throw lastException;
+						} else {
+							throw new Exception("无法找到可用的VPN服务类");
+						}
 					}
 				} catch (ClassNotFoundException e) {
 					Log.e(TAG, "加载鸿蒙VPN服务类失败: " + e.getMessage());
@@ -107,12 +129,14 @@ public class TProxyService extends VpnService {
 				
 				// 创建鸿蒙VPN服务实例
 				try {
+					Log.d(TAG, "开始创建VPN Builder实例...");
 					// 创建VPN Builder实例
 					Method newBuilderMethod = vpnServiceClass.getMethod("newBuilder");
 					Object builder = newBuilderMethod.invoke(null);
 					Log.i(TAG, "成功创建鸿蒙VPN Builder实例");
 					
 					// 设置VPN配置
+					Log.d(TAG, "开始设置VPN配置...");
 					Method setMtuMethod = vpnBuilderClass.getMethod("setMtu", int.class);
 					setMtuMethod.invoke(builder, 1500);
 					
@@ -120,6 +144,7 @@ public class TProxyService extends VpnService {
 					setBlockingMethod.invoke(builder, true);
 					
 					// 建立VPN连接
+					Log.d(TAG, "开始建立VPN连接...");
 					Method establishMethod = vpnBuilderClass.getMethod("establish");
 					vpnService = establishMethod.invoke(builder);
 					Log.i(TAG, "成功建立鸿蒙VPN连接");
@@ -129,6 +154,7 @@ public class TProxyService extends VpnService {
 					}
 				} catch (Exception e) {
 					Log.e(TAG, "创建鸿蒙VPN服务实例失败: " + e.getMessage());
+					Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
 					throw e;
 				}
 			} else {
