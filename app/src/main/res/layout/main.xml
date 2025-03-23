@@ -199,7 +199,6 @@
 		</LinearLayout>
 	</LinearLayout>
 	<hev.sockstun.RegularTextView
-		android:id="@+id/rt_view"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:text="中国网安创新中心"

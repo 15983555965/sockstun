@@ -26,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.net.VpnService;
 import android.widget.LinearLayout;
-import android.util.Log;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
@@ -313,68 +312,51 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private void initViews() {
         // 添加测试按钮
-        View rtView = findViewById(R.id.rt_view);
-        rtView.setOnClickListener(new View.OnClickListener() {
+        Button testButton = new Button(this);
+        testButton.setText("测试VPN连接");
+        testButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("MainActivity", "开始VPN连接测试");
-                
-                // 检查VPN是否已连接
-                if (!prefs.getEnable()) {
-                    Log.w("MainActivity", "VPN未连接，无法测试");
-                    Toast.makeText(MainActivity.this, "请先连接VPN", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                Log.i("MainActivity", "VPN已连接，开始网络测试");
-                Toast.makeText(MainActivity.this, "正在测试VPN连接...", Toast.LENGTH_SHORT).show();
-
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            Log.i("MainActivity", "开始访问测试网站");
-                            long startTime = System.currentTimeMillis();
                             URL url = new URL("https://www.youtube.com");
                             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                             connection.setConnectTimeout(5000);
                             connection.setReadTimeout(5000);
-                            Log.i("MainActivity", "连接已建立，等待响应");
-                            
                             int responseCode = connection.getResponseCode();
-                            long endTime = System.currentTimeMillis();
-                            final long responseTime = endTime - startTime;
-                            
-                            Log.i("MainActivity", String.format("测试完成: 响应码=%d, 响应时间=%dms", 
-                                responseCode, responseTime));
                             
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     if (responseCode == 200) {
-                                        String successMsg = String.format("VPN连接测试成功！\n响应时间：%dms", responseTime);
-                                        Toast.makeText(MainActivity.this, successMsg, Toast.LENGTH_LONG).show();
+                                        Toast.makeText(MainActivity.this, "VPN连接测试成功！", Toast.LENGTH_SHORT).show();
                                     } else {
-                                        String failMsg = String.format("VPN连接测试失败\n响应码：%d\n响应时间：%dms", 
-                                            responseCode, responseTime);
-                                        Toast.makeText(MainActivity.this, failMsg, Toast.LENGTH_LONG).show();
+                                        Toast.makeText(MainActivity.this, "VPN连接测试失败，响应码：" + responseCode, Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
                         } catch (Exception e) {
-                            Log.e("MainActivity", "测试失败", e);
                             final String errorMsg = e.getMessage();
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    String errorDetail = String.format("VPN连接测试失败\n错误：%s", errorMsg);
-                                    Toast.makeText(MainActivity.this, errorDetail, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(MainActivity.this, "VPN连接测试失败：" + errorMsg, Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
                     }
-                }).start();
+               	}).start();
             }
-        });
+       	});
+        
+        // 将测试按钮添加到布局中
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0, 10, 0, 10);
+        ((LinearLayout) findViewById(R.id.main_layout)).addView(testButton, params);
     }
 }

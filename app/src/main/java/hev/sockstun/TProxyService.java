@@ -160,23 +160,14 @@ public class TProxyService extends VpnService {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.i(TAG, "TProxyService onStartCommand: action=" + intent.getAction());
-		Log.i(TAG, "TProxyService 当前VPN状态: " + (tunFd != null ? "已连接" : "未连接"));
-		
-		if (intent.getAction().equals(ACTION_CONNECT)) {
-			Log.i(TAG, "开始建立VPN连接...");
-			if (tunFd != null) {
-				Log.w(TAG, "VPN已存在，先停止现有连接");
-				stopService();
-			}
-			startService();
-			return START_STICKY;
-		} else if (intent.getAction().equals(ACTION_DISCONNECT)) {
-			Log.i(TAG, "收到断开连接请求");
+		Log.d(TAG, "Service onStartCommand");
+		if (intent != null && ACTION_DISCONNECT.equals(intent.getAction())) {
 			stopService();
 			return START_NOT_STICKY;
 		}
-		return START_NOT_STICKY;
+		startService();
+		// 鸿蒙系统使用START_STICKY确保服务被杀死后重启
+		return isHarmonyOS() ? START_STICKY : START_STICKY;
 	}
 
 	@Override
