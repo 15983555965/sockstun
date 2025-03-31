@@ -31,5 +31,25 @@
         <item name="android:shadowRadius">2</item>
     </style>
 
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/backgroundColor</item>
+        <item name="materialButtonStyle">@style/AppButton</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="AppButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="backgroundTint">@color/colorPrimary</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+
+    <style name="OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="strokeColor">@color/colorPrimary</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
 
 </resources>

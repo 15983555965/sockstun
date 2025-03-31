@@ -12,7 +12,9 @@ package hev.sockstun;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -20,6 +22,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.app.Notification;
@@ -28,369 +34,468 @@ import android.app.PendingIntent;
 import android.net.VpnService;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ServiceInfo;
+import android.os.StrictMode;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import hev.sockstun.v2ray.Constants;
+import hev.sockstun.v2ray.GuardedProcess;
+import hev.sockstun.v2ray.MessageUtil;
+import hev.sockstun.v2ray.Socks5VpnService;
+import hev.sockstun.v2ray.Utils;
+
 public class TProxyService extends VpnService {
-	private static final String TAG = "TProxyService";
-	private static native void TProxyStartService(String config_path, int fd);
-	private static native void TProxyStopService();
-	private static native long[] TProxyGetStats();
+    private static final String TAG = "TProxyService";
+    private ConnectivityManager connectivity;
+    private ConnectivityManager.NetworkCallback defaultNetworkCallback;
+    private NetworkRequest defaultNetworkRequest;
+    private Process process;
 
-	public static final String ACTION_CONNECT = "hev.sockstun.CONNECT";
-	public static final String ACTION_DISCONNECT = "hev.sockstun.DISCONNECT";
+    private static native void TProxyStartService(String config_path, int fd);
 
-	static {
-		System.loadLibrary("hev-socks5-tunnel");
-	}
+    private static native void TProxyStopService();
 
-	private ParcelFileDescriptor tunFd = null;
-	private BroadcastReceiver systemEventReceiver = null;
+    private static native long[] TProxyGetStats();
 
-	/**
-	 * 检测是否为鸿蒙系统
-	 * @return true表示是鸿蒙系统，false表示是Android系统
-	 */
-	private boolean isHarmonyOS() {
-		try {
-			Class<?> buildExClass = Class.forName("com.huawei.system.BuildEx");
-			Object osBrand = buildExClass.getMethod("getOsBrand").invoke(buildExClass);
-			return "harmony".equalsIgnoreCase(osBrand.toString());
-		} catch (Exception e) {
-			Log.d(TAG, "Not running on HarmonyOS");
-			return false;
-		}
-	}
+    public static final String ACTION_CONNECT = "hev.sockstun.CONNECT";
+    public static final String ACTION_DISCONNECT = "hev.sockstun.DISCONNECT";
 
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		Log.d(TAG, "Service onCreate");
-		
-		// 设置进程优先级（Android和鸿蒙都支持）
-		android.os.Process.setThreadPriority(
-			android.os.Process.myTid(),
-			android.os.Process.THREAD_PRIORITY_FOREGROUND
-		);
+    private final ReceiveMessageHandler mMsgReceive = new ReceiveMessageHandler();
 
-		// 如果是鸿蒙系统，注册系统事件监听器
-		if (isHarmonyOS()) {
-			registerSystemEventReceiver();
-		}
-	}
+    private ParcelFileDescriptor tunFd = null;
+    private BroadcastReceiver systemEventReceiver = null;
 
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.i(TAG, "TProxyService onStartCommand: action=" + intent.getAction());
-		Log.i(TAG, "TProxyService 当前VPN状态: " + (tunFd != null ? "已连接" : "未连接"));
-		
-		if (intent.getAction().equals(ACTION_CONNECT)) {
-			Log.i(TAG, "开始建立VPN连接...");
-			if (tunFd != null) {
-				Log.w(TAG, "VPN已存在，先停止现有连接");
-				stopService();
-			}
-			startService();
-			return START_STICKY;
-		} else if (intent.getAction().equals(ACTION_DISCONNECT)) {
-			Log.i(TAG, "收到断开连接请求");
-			stopService();
-			return START_NOT_STICKY;
-		}
-		return START_NOT_STICKY;
-	}
+    /**
+     * 检测是否为鸿蒙系统
+     *
+     * @return true表示是鸿蒙系统，false表示是Android系统
+     */
+    private boolean isHarmonyOS() {
+        try {
+            Class<?> buildExClass = Class.forName("com.huawei.system.BuildEx");
+            Object osBrand = buildExClass.getMethod("getOsBrand").invoke(buildExClass);
+            return "harmony".equalsIgnoreCase(osBrand.toString());
+        } catch (Exception e) {
+            Log.d(TAG, "Not running on HarmonyOS");
+            return false;
+        }
+    }
 
-	@Override
-	public void onDestroy() {
-		Log.d(TAG, "Service onDestroy");
-		if (systemEventReceiver != null) {
-			unregisterReceiver(systemEventReceiver);
-		}
-		super.onDestroy();
-	}
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.d(TAG, "Service onCreate");
+        connectivity = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 
-	@Override
-	public void onRevoke() {
-		Log.d(TAG, "Service onRevoke");
-		stopService();
-		super.onRevoke();
-	}
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
-	/**
-	 * 注册系统事件监听器（仅鸿蒙系统）
-	 * 用于监听系统事件以保持VPN服务稳定运行
-	 */
-	private void registerSystemEventReceiver() {
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(Intent.ACTION_SCREEN_ON);
-		filter.addAction(Intent.ACTION_SCREEN_OFF);
-		filter.addAction(Intent.ACTION_BATTERY_LOW);
-		filter.addAction(Intent.ACTION_BATTERY_OKAY);
-		
-		systemEventReceiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				switch (intent.getAction()) {
-					case Intent.ACTION_SCREEN_ON:
-						Log.d(TAG, "Screen ON - Checking VPN status");
-						checkVPNStatus();
-						break;
-					case Intent.ACTION_BATTERY_LOW:
-						Log.d(TAG, "Battery LOW - Optimizing resource usage");
-						optimizeResourceUsage();
-						break;
-				}
-			}
-		};
-		registerReceiver(systemEventReceiver, filter);
-	}
+        connectivity = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        Log.d(TAG, "初始化网络连接管理器");
 
-	/**
-	 * 检查VPN状态
-	 */
-	private void checkVPNStatus() {
-		if (tunFd == null) {
-			Log.w(TAG, "VPN connection lost, attempting to reconnect");
-			startService();
-		}
-	}
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            Log.d(TAG, "Android P及以上版本，设置网络回调");
+            defaultNetworkRequest = new NetworkRequest.Builder()
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+                    .build();
 
-	/**
-	 * 优化资源使用
-	 */
-	private void optimizeResourceUsage() {
-		// 在低电量时优化资源使用
-		if (isHarmonyOS()) {
-			// 鸿蒙特定的资源优化
-			Log.d(TAG, "Optimizing resources for HarmonyOS");
-		}
-	}
+            defaultNetworkCallback = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(@NonNull Network network) {
+                    Log.d(TAG, "网络可用: " + network);
+                    setUnderlyingNetworks(new Network[]{network});
+                }
 
-	public void startService() {
-		if (tunFd != null) {
-			Log.d(TAG, "VPN service already running");
-			return;
-		}
+                @Override
+                public void onCapabilitiesChanged(@NonNull Network network, @NonNull NetworkCapabilities networkCapabilities) {
+                    Log.d(TAG, "网络能力变化: " + network + ", 能力: " + networkCapabilities);
+                    setUnderlyingNetworks(new Network[]{network});
+                }
 
-		Preferences prefs = new Preferences(this);
+                @Override
+                public void onLost(@NonNull Network network) {
+                    Log.w(TAG, "网络丢失: " + network);
+                    setUnderlyingNetworks(null);
+                }
+            };
+        }
 
-		/* VPN */
-		String session = new String();
-		VpnService.Builder builder = new VpnService.Builder();
-		
-		// 根据系统类型设置不同的VPN配置
-		if (isHarmonyOS()) {
-			Log.d(TAG, "Configuring VPN for HarmonyOS");
-			builder.setBlocking(true);  // 鸿蒙系统使用阻塞模式
-			builder.setMtu(1500);       // 鸿蒙默认MTU
-		} else {
-			Log.d(TAG, "Configuring VPN for Android");
-			builder.setBlocking(false);
-			builder.setMtu(prefs.getTunnelMtu());
-		}
+        // 注册广播接收器
+        try {
+            IntentFilter mFilter = new IntentFilter(Constants.BROADCAST_ACTION_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                registerReceiver(mMsgReceive, mFilter, Utils.receiverFlags());
+                Log.d(TAG, "广播接收器注册成功");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "注册广播接收器失败: " + e.getMessage(), e);
+        }
+    }
 
-		// IPv4配置
-		if (prefs.getIpv4()) {
-			String addr = prefs.getTunnelIpv4Address();
-			int prefix = prefs.getTunnelIpv4Prefix();
-			String dns = prefs.getDnsIpv4();
-			builder.addAddress(addr, prefix);
-			builder.addRoute("0.0.0.0", 0);
-			if (!dns.isEmpty())
-				builder.addDnsServer(dns);
-			session += "IPv4";
-		}
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, "TProxyService onStartCommand: action=" + intent.getAction());
+        Log.i(TAG, "TProxyService 当前VPN状态: " + (tunFd != null ? "已连接" : "未连接"));
 
-		// IPv6配置
-		if (prefs.getIpv6()) {
-			String addr = prefs.getTunnelIpv6Address();
-			int prefix = prefs.getTunnelIpv6Prefix();
-			String dns = prefs.getDnsIpv6();
-			builder.addAddress(addr, prefix);
-			builder.addRoute("::", 0);
-			if (!dns.isEmpty())
-				builder.addDnsServer(dns);
-			if (!session.isEmpty())
-				session += " + ";
-			session += "IPv6";
-		}
+        if (intent.getAction().equals(ACTION_CONNECT)) {
+            Log.i(TAG, "开始建立VPN连接...");
+            if (tunFd != null) {
+                Log.w(TAG, "VPN已存在，先停止现有连接");
+                stopService();
+            }
+            startService();
+            return START_STICKY;
+        } else if (intent.getAction().equals(ACTION_DISCONNECT)) {
+            Log.i(TAG, "收到断开连接请求");
+            stopService();
+            return START_NOT_STICKY;
+        }
+        return START_NOT_STICKY;
+    }
 
-		// 应用过滤配置
-		boolean disallowSelf = true;
-		if (prefs.getGlobal()) {
-			Log.d(TAG, "使用全局模式 - 所有应用允许");
-			session += "/Global";
-		} else {
-			Log.d(TAG, "使用应用过滤模式");
-			Log.d(TAG, "选中的应用列表: " + prefs.getApps());
-			
-			for (String appName : prefs.getApps()) {
-				try {
-					builder.addAllowedApplication(appName);
-					disallowSelf = false;
-					Log.d(TAG, "添加应用到允许列表: " + appName);
-				} catch (NameNotFoundException e) {
-					Log.e(TAG, "应用未找到: " + appName);
-				}
-			}
-			session += "/per-App";
-		}
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "Service onDestroy");
+        if (systemEventReceiver != null) {
+            unregisterReceiver(systemEventReceiver);
+        }
+        super.onDestroy();
+    }
 
-		if (disallowSelf) {
-			String selfName = getApplicationContext().getPackageName();
-			try {
-				Log.d(TAG, "没有选择任何应用，将VPN服务添加到禁止列表: " + selfName);
-				builder.addDisallowedApplication(selfName);
-			} catch (NameNotFoundException e) {
-				Log.e(TAG, "VPN服务未找到: " + selfName);
-			}
-		}
+    @Override
+    public void onRevoke() {
+        Log.d(TAG, "Service onRevoke");
+        stopService();
+        super.onRevoke();
+    }
 
-		builder.setSession(session);
-		Log.d(TAG, "VPN会话名称: " + session);
 
-		// 尝试建立VPN连接
-		try {
-			Log.d(TAG, "开始建立VPN连接...");
-			Log.d(TAG, "VPN配置信息:");
-			Log.d(TAG, "Session: " + session);
-			Log.d(TAG, "MTU: " + (isHarmonyOS() ? 1500 : prefs.getTunnelMtu()));
-			Log.d(TAG, "Blocking: " + isHarmonyOS());
-			
-			tunFd = builder.establish();
-			if (tunFd == null) {
-				Log.e(TAG, "VPN连接建立失败");
-				stopSelf();
-				return;
-			}
-			Log.d(TAG, "VPN连接建立成功");
-		} catch (Exception e) {
-			Log.e(TAG, "VPN错误: " + e.getMessage());
-			Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
-			stopSelf();
-			return;
-		}
+    public void startService() {
+        if (tunFd != null) {
+            Log.d(TAG, "VPN service already running");
+            return;
+        }
 
-		/* TProxy */
-		File tproxy_file = new File(getCacheDir(), "tproxy.conf");
-		try {
-			Log.d(TAG, "创建TProxy配置文件...");
-			tproxy_file.createNewFile();
-			FileOutputStream fos = new FileOutputStream(tproxy_file, false);
+        Preferences prefs = new Preferences(this);
 
-			String tproxy_conf = "misc:\n" +
-				"  task-stack-size: " + prefs.getTaskStackSize() + "\n" +
-				"tunnel:\n" +
-				"  mtu: " + prefs.getTunnelMtu() + "\n";
+        /* VPN */
+        String session = new String();
+        VpnService.Builder builder = new VpnService.Builder();
 
-			tproxy_conf += "socks5:\n" +
-				"  port: " + prefs.getSocksPort() + "\n" +
-				"  address: '" + prefs.getSocksAddress() + "'\n" +
-				"  udp: '" + (prefs.getUdpInTcp() ? "tcp" : "udp") + "'\n";
+        // 根据系统类型设置不同的VPN配置
+        if (isHarmonyOS()) {
+            Log.d(TAG, "Configuring VPN for HarmonyOS");
+            builder.setBlocking(true);  // 鸿蒙系统使用阻塞模式
+            builder.setMtu(1500);       // 鸿蒙默认MTU
+        } else {
+            Log.d(TAG, "Configuring VPN for Android");
+            builder.setBlocking(false);
+            builder.setMtu(prefs.getTunnelMtu());
+        }
 
-			if (!prefs.getSocksUsername().isEmpty() &&
-				!prefs.getSocksPassword().isEmpty()) {
-				tproxy_conf += "  username: '" + prefs.getSocksUsername() + "'\n";
-				tproxy_conf += "  password: '" + prefs.getSocksPassword() + "'\n";
-			}
+        // IPv4配置
+        if (prefs.getIpv4()) {
+            String addr = prefs.getTunnelIpv4Address();
+            int prefix = prefs.getTunnelIpv4Prefix();
+            String dns = prefs.getDnsIpv4();
+            builder.addAddress(addr, prefix);
+            builder.addRoute("0.0.0.0", 0);
+            if (!dns.isEmpty())
+                builder.addDnsServer(dns);
+            session += "IPv4";
+        }
 
-			Log.d(TAG, "TProxy配置文件路径: " + tproxy_file.getAbsolutePath());
-			Log.d(TAG, "TProxy配置内容:\n" + tproxy_conf);
-			
-			fos.write(tproxy_conf.getBytes());
-			fos.close();
-			Log.d(TAG, "TProxy配置文件写入成功");
-		} catch (IOException e) {
-			Log.e(TAG, "创建TProxy配置文件失败: " + e.getMessage());
-			Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
-			return;
-		}
+        // IPv6配置
+        if (prefs.getIpv6()) {
+            String addr = prefs.getTunnelIpv6Address();
+            int prefix = prefs.getTunnelIpv6Prefix();
+            String dns = prefs.getDnsIpv6();
+            builder.addAddress(addr, prefix);
+            builder.addRoute("::", 0);
+            if (!dns.isEmpty())
+                builder.addDnsServer(dns);
+            if (!session.isEmpty())
+                session += " + ";
+            session += "IPv6";
+        }
 
-		Log.d(TAG, "启动TProxy服务...");
-		try {
-			Log.d(TAG, "启动TProxy服务");
-			TProxyStartService(tproxy_file.getAbsolutePath(), tunFd.getFd());
-			Log.d(TAG, "TProxy服务启动成功");
-			prefs.setEnable(true);
-		} catch (Exception e) {
-			Log.e(TAG, "TProxy服务启动失败: " + e.getMessage());
-			Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
-			stopSelf();
-			return;
-		}
+        // 应用过滤配置
+        boolean disallowSelf = true;
+        if (prefs.getGlobal()) {
+            Log.d(TAG, "使用全局模式 - 所有应用允许");
+            session += "/Global";
+        } else {
+            Log.d(TAG, "使用应用过滤模式");
+            Log.d(TAG, "选中的应用列表: " + prefs.getApps());
 
-		String channelName = "socks5";
-		initNotificationChannel(channelName);
-		createNotification(channelName);
-		
-		Log.d(TAG, "VPN service started successfully");
-	}
+            for (String appName : prefs.getApps()) {
+                try {
+                    builder.addAllowedApplication(appName);
+                    disallowSelf = false;
+                    Log.d(TAG, "添加应用到允许列表: " + appName);
+                } catch (NameNotFoundException e) {
+                    Log.e(TAG, "应用未找到: " + appName);
+                }
+            }
+            session += "/per-App";
+        }
 
-	public void stopService() {
-		if (tunFd == null) {
-			Log.d(TAG, "VPN service not running");
-			return;
-		}
+        if (disallowSelf) {
+            String selfName = getApplicationContext().getPackageName();
+            try {
+                Log.d(TAG, "没有选择任何应用，将VPN服务添加到禁止列表: " + selfName);
+                builder.addDisallowedApplication(selfName);
+            } catch (NameNotFoundException e) {
+                Log.e(TAG, "VPN服务未找到: " + selfName);
+            }
+        }
 
-		Log.d(TAG, "开始停止VPN服务...");
-		
-		// 1. 停止前台服务
-		stopForeground(true);
-		Log.d(TAG, "前台服务已停止");
+        builder.setSession(session);
+        Log.d(TAG, "VPN会话名称: " + session);
 
-		// 2. 在后台线程中停止 TProxy 服务
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Log.d(TAG, "在后台线程中停止 TProxy 服务");
-					TProxyStopService();
-					Log.d(TAG, "TProxy服务已停止");
+        // 尝试建立VPN连接
+        try {
+            Log.d(TAG, "开始建立VPN连接...");
+            Log.d(TAG, "VPN配置信息:");
+            Log.d(TAG, "Session: " + session);
+            Log.d(TAG, "MTU: " + (isHarmonyOS() ? 1500 : prefs.getTunnelMtu()));
+            Log.d(TAG, "Blocking: " + isHarmonyOS());
 
-					// 3. 关闭 VPN 连接
-					try {
-						tunFd.close();
-						Log.d(TAG, "VPN连接已关闭");
-					} catch (IOException e) {
-						Log.e(TAG, "关闭VPN连接时发生错误: " + e.getMessage());
-					}
-					tunFd = null;
+            tunFd = builder.establish();
+            if (tunFd == null) {
+                Log.e(TAG, "VPN连接建立失败");
+                stopSelf();
+                return;
+            }
+            Log.d(TAG, "VPN连接建立成功");
+        } catch (Exception e) {
+            Log.e(TAG, "VPN错误: " + e.getMessage());
+            Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
+            stopSelf();
+            return;
+        }
 
-					// 4. 停止自身服务
-					stopSelf();
-					Log.d(TAG, "VPN服务已停止");
-				} catch (Exception e) {
-					Log.e(TAG, "停止服务时发生错误: " + e.getMessage());
-					Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
-					stopSelf();
-				}
-			}
-		}).start();
-	}
+        /* TProxy */
+        File tproxy_file = new File(getCacheDir(), "tproxy.conf");
+        try {
+            Log.d(TAG, "创建TProxy配置文件...");
+            tproxy_file.createNewFile();
+            FileOutputStream fos = new FileOutputStream(tproxy_file, false);
 
-	private void createNotification(String channelName) {
-		Intent i = new Intent(this, TProxyService.class);
-		PendingIntent pi = PendingIntent.getService(this, 0, i, PendingIntent.FLAG_IMMUTABLE);
-		NotificationCompat.Builder notification = new NotificationCompat.Builder(this, channelName);
-		Notification notify = notification
-				.setContentTitle(getString(R.string.app_name))
-				.setSmallIcon(android.R.drawable.sym_def_app_icon)
-				.setContentIntent(pi)
-				.build();
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-			startForeground(1, notify);
-		} else {
-			startForeground(1, notify, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
-		}
-	}
+            String tproxy_conf = "misc:\n" +
+                    "  task-stack-size: " + prefs.getTaskStackSize() + "\n" +
+                    "tunnel:\n" +
+                    "  mtu: " + prefs.getTunnelMtu() + "\n";
 
-	private void initNotificationChannel(String channelName) {
-		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			CharSequence name = getString(R.string.app_name);
-			NotificationChannel channel = new NotificationChannel(channelName, name, NotificationManager.IMPORTANCE_DEFAULT);
-			notificationManager.createNotificationChannel(channel);
-		}
-	}
+            tproxy_conf += "socks5:\n" +
+                    "  port: " + prefs.getSocksPort() + "\n" +
+                    "  address: '" + prefs.getSocksAddress() + "'\n" +
+                    "  udp: '" + (prefs.getUdpInTcp() ? "tcp" : "udp") + "'\n";
+
+            if (!prefs.getSocksUsername().isEmpty() &&
+                    !prefs.getSocksPassword().isEmpty()) {
+                tproxy_conf += "  username: '" + prefs.getSocksUsername() + "'\n";
+                tproxy_conf += "  password: '" + prefs.getSocksPassword() + "'\n";
+            }
+
+            Log.d(TAG, "TProxy配置文件路径: " + tproxy_file.getAbsolutePath());
+            Log.d(TAG, "TProxy配置内容:\n" + tproxy_conf);
+
+            fos.write(tproxy_conf.getBytes());
+            fos.close();
+            Log.d(TAG, "TProxy配置文件写入成功");
+        } catch (IOException e) {
+            Log.e(TAG, "创建TProxy配置文件失败: " + e.getMessage());
+            Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
+            return;
+        }
+
+        Log.d(TAG, "启动TProxy服务...");
+        try {
+            Log.d(TAG, "启动TProxy服务");
+            runTun2socks();
+            Log.d(TAG, "TProxy服务启动成功");
+            prefs.setEnable(true);
+        } catch (Exception e) {
+            Log.e(TAG, "TProxy服务启动失败: " + e.getMessage());
+            Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
+            stopSelf();
+            return;
+        }
+
+        String channelName = "socks5";
+        initNotificationChannel(channelName);
+        createNotification(channelName);
+
+        Log.d(TAG, "VPN service started successfully");
+    }
+
+    /**
+     * 运行tun2socks
+     */
+    private void runTun2socks() {
+        Log.d(TAG, "准备启动tun2socks");
+        List<String> cmd = new ArrayList<>();
+        cmd.add(new File(getApplicationInfo().nativeLibraryDir, Constants.TUN2SOCKS).getAbsolutePath());
+        cmd.add("--netif-ipaddr");
+        cmd.add(Constants.PRIVATE_VLAN4_ROUTER);
+        cmd.add("--netif-netmask");
+        cmd.add("255.255.255.252");
+        cmd.add("--socks-server-addr");
+        cmd.add(Constants.LOOPBACK + ":" + Constants.SOCKS_PORT);
+        cmd.add("--tunmtu");
+        cmd.add(String.valueOf(Constants.VPN_MTU));
+        cmd.add("--sock-path");
+        cmd.add("sock_path");
+        cmd.add("--enable-udprelay");
+        cmd.add("--loglevel");
+        cmd.add("notice");
+
+        // 添加IPv6支持（可选）
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            cmd.add("--netif-ip6addr");
+            cmd.add(Constants.PRIVATE_VLAN6_ROUTER);
+        }
+
+        Log.d(TAG, "tun2socks命令: " + String.join(" ", cmd));
+        Log.d(TAG, "tun2socks路径: " + new File(getApplicationInfo().nativeLibraryDir, Constants.TUN2SOCKS).getAbsolutePath());
+
+        // 启动tun2socks进程
+        ProcessBuilder pb = new ProcessBuilder(cmd);
+        pb.redirectErrorStream(true);
+        try {
+            process = pb.start();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public void stopService() {
+        if (tunFd == null) {
+            Log.d(TAG, "VPN service not running");
+            return;
+        }
+
+        Log.d(TAG, "开始停止VPN服务...");
+
+        // 1. 停止前台服务
+        stopForeground(true);
+        Log.d(TAG, "前台服务已停止");
+
+        // 2. 在后台线程中停止 TProxy 服务
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Log.d(TAG, "在后台线程中停止 TProxy 服务");
+                    stopServiceByLibTun2Socks();
+                    Log.d(TAG, "TProxy服务已停止");
+
+                    // 3. 关闭 VPN 连接
+                    try {
+                        tunFd.close();
+                        Log.d(TAG, "VPN连接已关闭");
+                    } catch (IOException e) {
+                        Log.e(TAG, "关闭VPN连接时发生错误: " + e.getMessage());
+                    }
+                    tunFd = null;
+
+                    // 4. 停止自身服务
+                    stopSelf();
+                    Log.d(TAG, "VPN服务已停止");
+                } catch (Exception e) {
+                    Log.e(TAG, "停止服务时发生错误: " + e.getMessage());
+                    Log.e(TAG, "错误堆栈: " + Arrays.toString(e.getStackTrace()));
+                    stopSelf();
+                }
+            }
+        }).start();
+    }
+    /**
+     * 停止VPN
+     */
+    private void stopServiceByLibTun2Socks() {
+//            if (!isRunning) {
+//                Log.w(TAG, "VPN未在运行，忽略停止请求");
+//                return;
+//            }
+//
+//            isRunning = false;
+            Log.i(TAG, "开始停止VPN服务");
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && connectivity != null) {
+                try {
+                    connectivity.unregisterNetworkCallback(defaultNetworkCallback);
+                    Log.d(TAG, "网络回调注销成功");
+                } catch (Exception e) {
+                    Log.e(TAG, "注销网络回调失败: " + e.getMessage());
+                }
+            }
+
+            try {
+                Log.d(TAG, "正在停止tun2socks进程");
+                process.destroy();
+                Log.d(TAG, "tun2socks进程已停止");
+            } catch (Exception e) {
+                Log.e(TAG, "停止tun2socks进程失败: " + e.getMessage(), e);
+            }
+
+            try {
+                tunFd.close();
+                Log.d(TAG, "VPN接口已关闭");
+            } catch (Exception e) {
+                Log.e(TAG, "关闭VPN接口失败: " + e.getMessage());
+            }
+
+            stopForeground(true);
+            stopSelf();
+            Log.i(TAG, "VPN服务已完全停止");
+
+            MessageUtil.sendMsg2UI(this, Constants.MSG_STATE_STOP_SUCCESS, "VPN已停止");
+        }
+
+
+    private void createNotification(String channelName) {
+        Intent i = new Intent(this, TProxyService.class);
+        PendingIntent pi = PendingIntent.getService(this, 0, i, PendingIntent.FLAG_IMMUTABLE);
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(this, channelName);
+        Notification notify = notification
+                .setContentTitle(getString(R.string.app_name))
+                .setSmallIcon(android.R.drawable.sym_def_app_icon)
+                .setContentIntent(pi)
+                .build();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(1, notify);
+        } else {
+            startForeground(1, notify, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+        }
+    }
+
+    private void initNotificationChannel(String channelName) {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.app_name);
+            NotificationChannel channel = new NotificationChannel(channelName, name, NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    /**
+     * 内部广播接收器类
+     */
+    private class ReceiveMessageHandler extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context ctx, Intent intent) {
+            int action = MessageUtil.getActionFromMsg(intent != null ? intent.getExtras() : null);
+            if (action == Constants.MSG_STATE_START) {
+                startService();
+            } else if (action == Constants.MSG_STATE_STOP) {
+                stopService();
+            }
+        }
+    }
 }

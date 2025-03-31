@@ -8,5 +8,15 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="colorPrimary">#2196F3</color>
+    <color name="colorPrimaryDark">#1976D2</color>
+    <color name="colorAccent">#FF9800</color>
+    <color name="backgroundColor">#F5F5F5</color>
+    <color name="textColorPrimary">#212121</color>
+    <color name="textColorSecondary">#757575</color>
+    <color name="colorError">#F44336</color>
+    <color name="colorSuccess">#4CAF50</color>
+    <color name="rippleColor">#33000000</color>
+    <color name="cardBackground">#FFFFFF</color>
+    <color name="dividerColor">#EEEEEE</color>
     <color name="gray">#808080</color>
 </resources>
