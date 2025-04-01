@@ -9,7 +9,8 @@
         android:theme="@style/AppTheme"
         android:extractNativeLibs="true"
         android:allowBackup="true"
-		android:supportsRtl="true">
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:supportsRtl="true">
         <service
             android:name=".v2ray.Socks5VpnService"
             android:exported="true"

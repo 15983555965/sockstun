@@ -252,9 +252,9 @@ public class Socks5VpnService extends VpnService implements ServiceControl {
 
             // 添加路由
             builder.addRoute("0.0.0.0", 0);  // 默认路由
-            builder.addRoute("10.0.0.0", 8);  // 内网路由
-            builder.addRoute("172.16.0.0", 12);  // 内网路由
-            builder.addRoute("192.168.0.0", 16);  // 内网路由
+//            builder.addRoute("10.0.0.0", 8);  // 内网路由
+//            builder.addRoute("172.16.0.0", 12);  // 内网路由
+//            builder.addRoute("192.168.0.0", 16);  // 内网路由
             Log.d(TAG, "添加IPv4路由配置完成");
 
             // 添加IPv6支持（可选）
