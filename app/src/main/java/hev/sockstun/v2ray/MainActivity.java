@@ -143,7 +143,11 @@ public class MainActivity extends AppCompatActivity {
 
         // 注册广播接收器
         IntentFilter filter = new IntentFilter(Constants.BROADCAST_ACTION_ACTIVITY);
-        registerReceiver(messageReceiver, filter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            registerReceiver(messageReceiver, filter,Context.RECEIVER_NOT_EXPORTED);
+        }else{
+            registerReceiver(messageReceiver, filter);
+        }
 
         // 注册VPN状态监听
         IntentFilter vpnFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);

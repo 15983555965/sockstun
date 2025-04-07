@@ -25,17 +25,12 @@ import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.io.FileDescriptor;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import hev.sockstun.MyVpnApplication;
-import hev.sockstun.Preferences;
 
 public class Socks5VpnService extends VpnService implements ServiceControl {
     private static final String TAG = "Socks5VpnService";
@@ -252,10 +247,14 @@ public class Socks5VpnService extends VpnService implements ServiceControl {
 
             // 添加路由
             builder.addRoute("0.0.0.0", 0);  // 默认路由
-//            builder.addRoute("10.0.0.0", 8);  // 内网路由
-//            builder.addRoute("172.16.0.0", 12);  // 内网路由
-//            builder.addRoute("192.168.0.0", 16);  // 内网路由
             Log.d(TAG, "添加IPv4路由配置完成");
+            //添加DNS服务器
+//            val DNS_GOOGLE_ADDRESSES = arrayListOf("8.8.8.8", "8.8.4.4", "2001:4860:4860::8888", "2001:4860:4860::8844")
+
+            builder.addDnsServer("8.8.8.8");
+//            builder.addDnsServer("8.8.4.4");
+//            builder.addDnsServer("8.8.8.8");
+//            builder.addDnsServer("8.8.8.8");
 
             // 添加IPv6支持（可选）
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

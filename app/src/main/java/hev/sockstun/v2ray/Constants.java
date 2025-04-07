@@ -9,11 +9,7 @@ public class Constants {
     public static final String PRIVATE_VLAN4_ROUTER = "10.10.14.2";
     public static final String PRIVATE_VLAN6_CLIENT = "fc00::10:10:14:1";
     public static final String PRIVATE_VLAN6_ROUTER = "fc00::10:10:14:2";
-    public static final String PDNSD = "libpdnsd.so";
-    public static final String PROXYCHAINS4 = "libproxychains4.so";
-    public static final String SS_LOCAL = "libssr-local.so";
     public static final String TUN2SOCKS = "libtun2socks.so";
-    public static final String currentVersionCode="currentVersionCode";
 
     /** Socks5代理常量 */
     public static final int SOCKS_PORT = 1080; // 默认使用1080端口，不是10808
@@ -44,4 +40,5 @@ public class Constants {
     public static final int TASK_STACK_SIZE = 81920;
     public static final String SOCKS_USERNAME = "";
     public static final String SOCKS_USERNAME_PASSWORD = "";
+    public static final boolean PREF_LOCAL_DNS_ENABLED = true;
 }

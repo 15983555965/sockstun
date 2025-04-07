@@ -24,7 +24,7 @@
 	<string name="stop_vpn">停止VPN</string>
 	<string name="running">运行中</string>
 	<string name="stopped">已停止</string>
-	<string name="info_text">流量将通过本地1080端口转发</string>
+	<string name="info_text">流量将通过隐蔽通讯链路转发</string>
 	<string name="vpn_start_success">VPN启动成功</string>
 	<string name="vpn_start_failed">VPN启动失败</string>
 	<string name="vpn_stopped">VPN已停止</string>
