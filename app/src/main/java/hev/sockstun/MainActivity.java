@@ -160,7 +160,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         //updateUI();
         timerTextView.setVisibility(View.VISIBLE);
         timerTitle.setVisibility(View.VISIBLE);
-        timerTextView.setVisibility(View.VISIBLE);
     }
 
     @Override
